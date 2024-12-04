@@ -4,7 +4,7 @@ services:
   db:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: mariadb/Dockerfile
     container_name: mariadb
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -27,6 +27,22 @@ services:
       - "8080:80"
     depends_on:
       - db
+    
+  fastapi:
+    build:
+      context: .
+      dockerfile: fastapi/Dockerfile  # Ruta a tu directorio con el Dockerfile para FastAPI
+    container_name: fastapi
+    ports:
+      - "8000:8000"  # Puerto expuesto
+    depends_on:
+      - db  # Si tu FastAPI depende de la base de datos
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
 
 volumes:
   docker_mariadb_data:  # Usamos el volumen existente en lugar de crear uno nuevo
