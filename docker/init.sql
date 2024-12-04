@@ -1,0 +1,35 @@
+CREATE TABLE Users (
+  email varchar(255) PRIMARY KEY,
+  name varchar(25) NOT NULL,
+  surname varchar(50) NOT NULL,
+  hashed_password TEXT NOT NULL
+);
+
+CREATE TABLE Posts (
+  post_id INT AUTO_INCREMENT PRIMARY KEY,
+  title varchar(100) NOT NULL,
+  description varchar(1000) NOT NULL,
+  post_timestamp timestamp NOT NULL,
+  is_sold BOOLEAN DEFAULT false,
+  user_email varchar(255),
+  FOREIGN KEY (user_email) REFERENCES Users(email)
+);
+
+CREATE TABLE Vehicles (
+  license_plate varchar(20) PRIMARY KEY,
+  registration_year INT(4) NOT NULL,
+  observations varchar(1000),
+  vehicle_type varchar(25) NOT NULL,
+  fuel_type varchar(25) NOT NULL,
+  photo BLOB,
+  post_id INT,
+  FOREIGN KEY (post_id) REFERENCES Posts(post_id)
+);
+
+CREATE TABLE SessionTokens (
+  token VARCHAR(255) PRIMARY KEY,
+  user_email VARCHAR(255),
+  expiration_timestamp TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_email) REFERENCES Users(email)
+);

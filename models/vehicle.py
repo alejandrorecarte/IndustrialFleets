@@ -8,4 +8,4 @@ class Vehicle(BaseModel):
     observations: str
     vehicle_type: VehicleType
     fuel_type: FuelType
-    photos: List[str]
+    post_id: int
