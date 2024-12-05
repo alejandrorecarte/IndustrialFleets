@@ -9,9 +9,7 @@ import os
 
 load_dotenv()
 
-connect_to_db(os.getenv(""))
-
-print(f"Debug Mode: {debug_mode}")
+#connect_to_db(os.getenv(""))
 
 app = FastAPI()
 
