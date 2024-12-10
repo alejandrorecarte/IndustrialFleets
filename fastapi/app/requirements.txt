@@ -4,3 +4,4 @@ python-dotenv
 configparser
 mysql-connector-python
 pymysql
+bcrypt

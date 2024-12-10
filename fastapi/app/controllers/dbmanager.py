@@ -1,5 +1,5 @@
 import pymysql
-from dotenv import load_dotenv
+from controllers.exceptions import DbException
 
 def connect_to_db(host: str, port:int, user:str, password:str, database:str):
     try:
@@ -14,8 +14,8 @@ def connect_to_db(host: str, port:int, user:str, password:str, database:str):
         
         return connection
     
-    except pymysql.MySQLError as e:
-        raise Exception(message=e)
+    except pymysql.MySQLError as error:
+        raise DbException(str(error))
         
 def close_connection(connection):
     connection.close()
@@ -30,5 +30,6 @@ def execute_query(query:str, params, connection):
             # Confirmar la transacción
             connection.commit()
             
-    except pymysql.MySQLError as e:
+    except pymysql.MySQLError as error:
         connection.rollback()
+        raise DbException(str(error))

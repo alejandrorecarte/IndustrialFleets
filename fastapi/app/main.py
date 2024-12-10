@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from controllers.vehicle import create_vehicle
 from models.vehicle import Vehicle
-from models.enums import VehicleType, FuelType
+from models.post import Post
+from models.user import User
 from dotenv import load_dotenv
 from controllers.dbmanager import connect_to_db, close_connection
+from controllers.user import create_user
 import os
 import logging
 import time
@@ -70,19 +72,32 @@ async def shutdown_event():
         close_connection(db_connection)
         logger.info("DB connection closed.")
 
-@app.get("/")
-def read_root():
-    return {"message": "Hola caracola"}
+@app.post("/user/create")
+def post_create_user(email: str, name: str, surname: str, password: str):
+    try:
+        user = User(email=email, name=name, surname=surname, password=password)
+        logger.info(user.__str__)
+        create_user(user, db_connection)
+        return {"success": True, "errors": str(error)}
+    except Exception as error:
+        logger.warning(str(error))
+        return {"success": False, "errors": str(error)}  
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str = None):
-    return {"item_id": item_id, "q": q}
+@app.post("/post/create")
+def post_create_post(post: Post):
+    try:
+        create_post(post, db_connection)
+        return {"success": True, "errors": None}
+    except Exception as error:
+        logger.warning(str(error))
+        return {"success": False, "errors": str(error)}
 
 @app.post("/vehicle/create")
-def create_vehicle(vehicle: Vehicle):
+def post_create_vehicle(vehicle: Vehicle):
     try:
-        
         create_vehicle(vehicle, db_connection)
         return {"success": True, "errors": None}
     except Exception as error:
-        return {"success": False, "errors": error.__repr__}
+        # Usar str(error) para una descripción más clara
+        logger.warning(str(error))
+        return {"success": False, "errors": str(error)}

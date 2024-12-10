@@ -1,5 +1,3 @@
-from vehicle import Vehicle
-from typing import List
 from pydantic import BaseModel
 
 class Post(BaseModel):

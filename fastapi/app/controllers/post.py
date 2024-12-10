@@ -1,4 +1,4 @@
-from models.vehicle import Vehicle
+from models.post import Post
 from controllers.queries import create_vehicle_query
 from controllers.dbmanager import execute_query
 
