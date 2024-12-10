@@ -8,4 +8,5 @@ class Vehicle(BaseModel):
     observations: str
     vehicle_type: VehicleType
     fuel_type: FuelType
+    photo: str  # Corregido: agregamos la anotación de tipo correctamente
     post_id: int
