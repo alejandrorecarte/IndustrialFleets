@@ -6,9 +6,3 @@ def create_user_query():
 
 def login_query():
     return "SELECT * FROM Users WHERE email LIKE %s;"
-
-def create_access_token():
-    return "INSERT INTO SessionTokens (token, user_email, expiration_timestamp) VALUES (%s, %s, %s)"
-
-def delete_access_token_if_exists():
-    return "DELETE FROM SessionTokens WHERE user_email LIKE %s"

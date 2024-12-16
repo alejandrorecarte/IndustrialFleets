@@ -25,11 +25,3 @@ CREATE TABLE Vehicles (
   post_id INT,
   FOREIGN KEY (post_id) REFERENCES Posts(post_id)
 );
-
-CREATE TABLE SessionTokens (
-  token VARCHAR(255) PRIMARY KEY,
-  user_email VARCHAR(255),
-  expiration_timestamp TIMESTAMP NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_email) REFERENCES Users(email)
-);

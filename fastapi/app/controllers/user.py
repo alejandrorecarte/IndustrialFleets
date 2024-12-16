@@ -1,6 +1,6 @@
 from models.user import User
 from fastapi import HTTPException
-from controllers.queries import create_user_query, login_query, create_access_token, delete_access_token_if_exists
+from controllers.queries import create_user_query, login_query
 from controllers.dbmanager import execute, execute_query
 from utils import verify_hash
 import datetime
@@ -21,12 +21,6 @@ def login(email: str, password: str, db_connection):
     
     if users:
         if verify_hash(password, users[0][3]):
-            params = (email)
-            
-            try:
-                execute(delete_access_token_if_exists(), params, db_connection)
-            except Exception as error:
-                raise Exception(str(error))
             
             expiration_time = datetime.datetime.utcnow() + datetime.timedelta(minutes=int(os.getenv("EXPIRATION_MINUTES")))
             payload = {
@@ -36,10 +30,7 @@ def login(email: str, password: str, db_connection):
             
             # Generar el token
             token = jwt.encode(payload, os.getenv("SECRET_KEY"), algorithm="HS256")
-            params = (token, email, expiration_time)
-            
-            execute(create_access_token(), params, db_connection)
-            
+                        
             return token
         else:
             raise Exception("Credentials could not be verified")
