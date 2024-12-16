@@ -22,9 +22,20 @@ def close_connection(connection):
     connection.close()
     
 def execute(query:str, params, connection):
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(levelname)s - %(name)s - %(asctime)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler('app.log')
+        ]
+    )
+    logger = logging.getLogger(__name__)
+    
     try:
         # Crear un cursor
         with connection.cursor() as cursor:
+            logger.info(f"Executing query: {query} with params: {params}")
             # Ejecutar la consulta
             cursor.execute(query, params)
             
@@ -33,10 +44,8 @@ def execute(query:str, params, connection):
             
     except pymysql.MySQLError as error:
         connection.rollback()
+        logger.warning(str(error))
         raise DbException(str(error))
-    
-import logging
-import pymysql
 
 def execute_query(query: str, params, connection):
     logging.basicConfig(
@@ -65,6 +74,6 @@ def execute_query(query: str, params, connection):
             return results
     except pymysql.MySQLError as error:
         connection.rollback()
-        logger.warning(f"Error trying to query: {error}")
+        logger.warning(str(error))
         raise DbException(str(error))
 

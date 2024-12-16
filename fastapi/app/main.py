@@ -1,17 +1,19 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from controllers.vehicle import create_vehicle
 from models.vehicle import Vehicle
 from models.post import Post
 from models.user import User
 from dotenv import load_dotenv
 from controllers.dbmanager import connect_to_db, close_connection
-from controllers.user import create_user, login
+from controllers.user import create_user, login, verify_token
 from utils import hash
 import os
 import logging
 import time
 
 app = FastAPI()
+security = HTTPBearer()
 
 # Configuración del logger
 logging.basicConfig(
@@ -58,6 +60,21 @@ def init_app():
     except Exception as e:
         logger.error(f"Error in app initialization: {e}")
         return None
+    
+def get_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    """
+    Función que extrae el token Bearer del encabezado Authorization.
+    Si no se encuentra o es inválido, se lanza una excepción HTTP.
+    """
+    return credentials.credentials  # Devuelve el token (credentials.credentials)
+
+
+@app.get("/secure-endpoint")
+def secure_endpoint(token: str = Depends(get_token)):
+    """
+    Endpoint protegido que requiere el token Bearer en la cabecera.
+    """
+    return {"message": "Access granted", "token": token}
 
 @app.on_event("startup")
 async def startup_event():
@@ -103,8 +120,9 @@ def post_create_post(post: Post):
         return {"success": False, "errors": str(error)}
 
 @app.post("/vehicle/create")
-def post_create_vehicle(vehicle: Vehicle):
+def post_create_vehicle(vehicle: Vehicle, token: str = Depends(get_token)):
     try:
+        verify_token(token)
         create_vehicle(vehicle, db_connection)
         return {"success": True, "errors": None}
     except Exception as error:

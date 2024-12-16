@@ -5,3 +5,4 @@ configparser
 mysql-connector-python
 pymysql
 bcrypt
+pyjwt

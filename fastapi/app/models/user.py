@@ -1,6 +1,5 @@
 from pydantic import BaseModel, root_validator
 from utils import hash
-import bcrypt
 
 class User(BaseModel):
     email: str
