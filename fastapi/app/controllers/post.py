@@ -1,10 +1,10 @@
 from models.post import Post
-from controllers.queries import create_vehicle_query
-from controllers.dbmanager import execute_query
+from controllers.queries import create_post_query
+from controllers.dbmanager import execute
 
-def create_vehicle(vehicle: Vehicle, db_connection):
+def create_post(post: Post, db_connection):
 
-    query = create_vehicle_query()
-    params = (vehicle.license_plate, vehicle.registration_year, vehicle.observations, vehicle.vehicle_type, vehicle.fuel_type, vehicle.photo, vehicle.post_id)
+    query = create_post_query()
+    params = ()
     
-    execute_query(query, params, db_connection)
+    execute(query, params, db_connection)

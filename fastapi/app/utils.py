@@ -1,0 +1,10 @@
+import bcrypt
+
+def hash(value):
+    if value:
+        # Generamos el hash de la contraseña utilizando bcrypt
+        hashed = bcrypt.hashpw(value.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    return hashed
+
+def verify_hash(value, stored_hash):
+    return bcrypt.checkpw(value.encode('utf-8'), stored_hash.encode('utf-8'))

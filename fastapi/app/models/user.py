@@ -1,4 +1,5 @@
 from pydantic import BaseModel, root_validator
+from utils import hash
 import bcrypt
 
 class User(BaseModel):
@@ -12,8 +13,5 @@ class User(BaseModel):
     @root_validator(pre=True)
     def hash_password(cls, values):
         password = values.get('password')
-        if password:
-            # Generamos el hash de la contraseña utilizando bcrypt
-            hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-            values['hashed_password'] = hashed
+        values["hashed_password"] = hash(password)
         return values
