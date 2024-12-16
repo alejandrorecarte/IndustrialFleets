@@ -14,7 +14,8 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - docker_mariadb_data:/var/lib/mysql   # Usamos el volumen existente
+      - docker_mariadb_data:/var/lib/mysql  # Volumen para persistir datos de MariaDB
+      - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql  # Si deseas inicializar la base de datos con un archivo SQL
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
@@ -31,19 +32,21 @@ services:
   fastapi:
     build:
       context: .
-      dockerfile: fastapi/Dockerfile  # Ruta a tu directorio con el Dockerfile para FastAPI
+      dockerfile: fastapi/Dockerfile
     container_name: fastapi
     ports:
-      - "8000:8000"  # Puerto expuesto
+      - "8000:8000"
     depends_on:
-      - db  # Si tu FastAPI depende de la base de datos
+      - db
     environment:
       DB_HOST: db
       DB_PORT: 3306
       DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
       DB_NAME: ${MYSQL_DATABASE}
+    volumes:
+      - ./fastapi/app:/fastapi/app  # Volumen compartido para FastAPI (para persistencia de archivos y datos)
 
 volumes:
-  docker_mariadb_data:  # Usamos el volumen existente en lugar de crear uno nuevo
+  docker_mariadb_data:  # Volumen para la persistencia de datos de MariaDB
     driver: local

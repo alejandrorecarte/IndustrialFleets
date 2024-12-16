@@ -8,7 +8,7 @@ LABEL maintainer="alejandro.recarte.rebollo@gmail.com"
 # Por ejemplo, podrías agregar un archivo de configuración custom para MariaDB
 # COPY ./my.cnf /etc/mysql/my.cnf
 
-COPY init.sql /docker-entrypoint-initdb.d/
+COPY /mariadb/init.sql /docker-entrypoint-initdb.d/
 
 # Copia scripts de inicialización, si tienes alguno
 # Estos scripts se ejecutarán cuando el contenedor se inicie por primera vez
