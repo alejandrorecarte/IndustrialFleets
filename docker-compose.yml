@@ -25,7 +25,7 @@ services:
       PMA_PORT: 3306
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
-      - "8080:80"
+      - "8001:80"
     depends_on:
       - db
     
@@ -46,6 +46,16 @@ services:
       DB_NAME: ${MYSQL_DATABASE}
     volumes:
       - ./fastapi/app:/fastapi/app  # Volumen compartido para FastAPI (para persistencia de archivos y datos)
+
+  apache:
+    build:
+      context: .
+      dockerfile: apache/Dockerfile
+    container_name: apache
+    ports:
+      - "8080:80"
+    volumes:
+      - ./apache/app:/usr/local/apache2/htdocs/
 
 volumes:
   docker_mariadb_data:  # Volumen para la persistencia de datos de MariaDB
