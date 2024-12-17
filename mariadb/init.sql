@@ -9,7 +9,7 @@ CREATE TABLE Posts (
   post_id INT AUTO_INCREMENT PRIMARY KEY,
   title varchar(100) NOT NULL,
   description varchar(1000) NOT NULL,
-  post_timestamp timestamp NOT NULL,
+  post_timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   is_sold BOOLEAN DEFAULT false,
   user_email varchar(255),
   FOREIGN KEY (user_email) REFERENCES Users(email)

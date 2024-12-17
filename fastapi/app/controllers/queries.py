@@ -6,3 +6,9 @@ def create_user_query():
 
 def login_query():
     return "SELECT * FROM Users WHERE email LIKE %s;"
+
+def create_post_query():
+    return "INSERT INTO Posts (title, description, is_sold ,user_email) VALUES (%s, %s, %s, %s)"
+
+def get_last_id():
+    return "SELECT LAST_INSERT_ID()"

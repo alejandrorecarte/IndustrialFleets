@@ -1,6 +1,6 @@
 from models.vehicle import Vehicle
-from controllers.queries import create_vehicle_query
-from controllers.dbmanager import execute
+from controllers.queries import create_vehicle_query, get_last_id
+from controllers.dbmanager import execute, execute_query
 
 def create_vehicle(vehicle: Vehicle, db_connection):
 
