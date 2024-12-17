@@ -1,10 +1,10 @@
 from models.vehicle import Vehicle
-import configparser
+from controllers.queries import create_vehicle_query, get_last_id
+from controllers.dbmanager import execute, execute_query
 
-def create_vehicle(vehicle: Vehicle):
-    config = configparser.ConfigParser()
-    config.read('constants.conf')
-    max_photos = config.get("vehicles", "max_photos")
-    if len(vehicle.photos) > max_photos:
-        raise Exception(f"More than {max_photos} is not allowed.")
-        
+def create_vehicle(vehicle: Vehicle, db_connection):
+
+    query = create_vehicle_query()
+    params = (vehicle.license_plate, vehicle.registration_year, vehicle.observations, vehicle.vehicle_type, vehicle.fuel_type, vehicle.photo, vehicle.post_id)
+    
+    execute(query, params, db_connection)

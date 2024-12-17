@@ -3,4 +3,6 @@ uvicorn
 python-dotenv
 configparser
 mysql-connector-python
-PyMySQL
+pymysql
+bcrypt
+pyjwt

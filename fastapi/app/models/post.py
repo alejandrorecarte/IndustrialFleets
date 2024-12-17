@@ -1,10 +1,9 @@
-from vehicle import Vehicle
-from typing import List
 from pydantic import BaseModel
 
 class Post(BaseModel):
-    id_anuncio: int
+    post_id: int = None
     title: str
     description: str
-    post_timestamp:int
-    user_email:str
+    post_timestamp:int = None
+    is_sold:bool = False
+    user_email:str = None

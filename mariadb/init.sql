@@ -9,7 +9,7 @@ CREATE TABLE Posts (
   post_id INT AUTO_INCREMENT PRIMARY KEY,
   title varchar(100) NOT NULL,
   description varchar(1000) NOT NULL,
-  post_timestamp timestamp NOT NULL,
+  post_timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   is_sold BOOLEAN DEFAULT false,
   user_email varchar(255),
   FOREIGN KEY (user_email) REFERENCES Users(email)
@@ -24,12 +24,4 @@ CREATE TABLE Vehicles (
   photo BLOB,
   post_id INT,
   FOREIGN KEY (post_id) REFERENCES Posts(post_id)
-);
-
-CREATE TABLE SessionTokens (
-  token VARCHAR(255) PRIMARY KEY,
-  user_email VARCHAR(255),
-  expiration_timestamp TIMESTAMP NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_email) REFERENCES Users(email)
 );

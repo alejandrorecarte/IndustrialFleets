@@ -1,23 +1,79 @@
 import pymysql
-from dotenv import load_dotenv
+from controllers.exceptions import DbException
+import logging
 
-def connect_to_db(host: str, user:str, password:str, database:str):
+def connect_to_db(host: str, port:int, user:str, password:str, database:str):
     try:
         # Conectar a la base de datos
         connection = pymysql.connect(
-            host,
-            user,
-            password,
-            database
+            host=host,        # Dirección del host (por ejemplo, 'localhost')
+            port= port,
+            user=user,        # Usuario de la base de datos
+            password=password, # Contraseña del usuario
+            database=database  # Nombre de la base de datos
         )
         
+        return connection
+    
+    except pymysql.MySQLError as error:
+        raise DbException(str(error))
+        
+def close_connection(connection):
+    connection.close()
+    
+def execute(query:str, params, connection):
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(levelname)s - %(name)s - %(asctime)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler('app.log')
+        ]
+    )
+    logger = logging.getLogger(__name__)
+    
+    try:
+        # Crear un cursor
         with connection.cursor() as cursor:
-            cursor.execute("SELECT DATABASE();")
-            db_info = cursor.fetchone()
-            print(f"Conectado a la base de datos: {db_info}")
-    
-    except pymysql.MySQLError as e:
-        print(f"Error al conectar a MariaDB: {e}")
-    
-    finally:
-        connection.close()
+            logger.info(f"Executing query: {query} with params: {params}")
+            # Ejecutar la consulta
+            cursor.execute(query, params)
+            
+            # Confirmar la transacción
+            connection.commit()
+            
+    except pymysql.MySQLError as error:
+        connection.rollback()
+        logger.warning(str(error))
+        raise DbException(str(error))
+
+def execute_query(query: str, params, connection):
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(levelname)s - %(name)s - %(asctime)s - %(message)s',
+        handlers=[
+            logging.StreamHandler(),
+            logging.FileHandler('app.log')
+        ]
+    )
+
+    # Crear un logger
+    logger = logging.getLogger(__name__)
+    try:
+        # Crear un cursor para ejecutar la consulta
+        with connection.cursor() as cursor:            
+            logger.info(f"Executing query: {query} with params: {params}")
+            
+            # Ejecutar la consulta con los parámetros
+            cursor.execute(query, params)  # Nota: Aquí pasamos `query` y `params` correctamente
+            
+            # Obtener los resultados
+            results = cursor.fetchall()
+            logger.info(f"Query results: {results}")
+            
+            return results
+    except pymysql.MySQLError as error:
+        connection.rollback()
+        logger.warning(str(error))
+        raise DbException(str(error))
+
