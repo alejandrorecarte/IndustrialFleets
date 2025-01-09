@@ -5,6 +5,7 @@ from models.vehicle import Vehicle
 from models.post import Post
 from models.user import User
 from dotenv import load_dotenv
+from starlette.middleware.cors import CORSMiddleware
 from controllers.dbmanager import connect_to_db, close_connection
 from controllers.user import create_user, login, verify_token
 from controllers.post import create_post, update_post, delete_post, get_post, get_post_last, get_post_user, get_post_user_pages, get_post_last_pages
@@ -14,6 +15,14 @@ import time
 
 app = FastAPI()
 security = HTTPBearer()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],  # Permitir solicitudes desde el frontend
+    allow_credentials=True,
+    allow_methods=["*"],  # Permitir todos los métodos (GET, POST, etc.)
+    allow_headers=["*"],  # Permitir todos los encabezados
+)
 
 # Configuración del logger
 logging.basicConfig(
@@ -90,12 +99,14 @@ async def shutdown_event():
         close_connection(db_connection)
         logger.info("DB connection closed.")
 
-@app.post("/register", status_code=status.HTTP_201_CREATED)
+@app.post("/api/register", status_code=status.HTTP_201_CREATED)
 def post_register(email: str, name: str, surname: str, password: str):
     try:
         user = User(email=email, name=name, surname=surname, password=password)
         create_user(user, db_connection)
-        return {"user": {"email": email, "name" : name, "surname": surname}}
+        access_token = login(email=email, password=password, db_connection=db_connection)
+
+        return {"token": access_token}
     except Exception as error:
         logger.warning(str(error))
         raise HTTPException(
@@ -103,12 +114,12 @@ def post_register(email: str, name: str, surname: str, password: str):
                     detail=str(error)
                 )
     
-@app.post("/login", status_code=status.HTTP_202_ACCEPTED)
+@app.post("/api/login", status_code=status.HTTP_202_ACCEPTED)
 def post_login(email: str, password:str):
     try:
         access_token = login(email= email, password=password, db_connection = db_connection)
         if access_token:
-            return {"access_token": access_token}
+            return {"token": access_token}
     except Exception as error:
         logger.warning(str(error))
         raise HTTPException(
@@ -116,7 +127,7 @@ def post_login(email: str, password:str):
                     detail=str(error)
                 )
 
-@app.post("/post/create", status_code=status.HTTP_201_CREATED)
+@app.post("/api/post/create", status_code=status.HTTP_201_CREATED)
 def post_create_post(post: Post, token: str = Depends(get_token)):
     post.user_email = token["user_email"]
     try:
@@ -129,7 +140,7 @@ def post_create_post(post: Post, token: str = Depends(get_token)):
                     detail=str(error)
                 )
         
-@app.post("/post/update", status_code=status.HTTP_200_OK)
+@app.post("/api/post/update", status_code=status.HTTP_200_OK)
 def post_update_post(post: Post, token: str = Depends(get_token)):
     user_email = token["user_email"]
     try:
@@ -148,7 +159,7 @@ def post_update_post(post: Post, token: str = Depends(get_token)):
                     detail=str(error)
                 )
         
-@app.post("/post/delete", status_code=status.HTTP_200_OK)
+@app.post("/api/post/delete", status_code=status.HTTP_200_OK)
 def post_delete_post(post_id: int, token: str = Depends(get_token)):
     user_email = token["user_email"]
     try:
@@ -167,7 +178,7 @@ def post_delete_post(post_id: int, token: str = Depends(get_token)):
                     detail=str(error)
                 )
         
-@app.get("/post/get", status_code=status.HTTP_200_OK)
+@app.get("/api/post/get", status_code=status.HTTP_200_OK)
 def get_post_by_id(post_id: int, token: str = Depends(get_token)):
     user_email = token["user_email"]
     try:
@@ -180,7 +191,7 @@ def get_post_by_id(post_id: int, token: str = Depends(get_token)):
                     detail=str(error)
                 )
         
-@app.get("/post/getuser", status_code=status.HTTP_200_OK)
+@app.get("/api/post/getuser", status_code=status.HTTP_200_OK)
 def get_user_post(user_email: str, page: int, token: str = Depends(get_token)):
     try:
         posts = get_post_user(user_email, page, db_connection)
@@ -195,7 +206,7 @@ def get_user_post(user_email: str, page: int, token: str = Depends(get_token)):
                     detail=str(error)
                 )
         
-@app.get("/post/getlast", status_code=status.HTTP_200_OK)
+@app.get("/api/post/getlast", status_code=status.HTTP_200_OK)
 def get_last_post(page: int, token: str = Depends(get_token)):
     try:
         posts = get_post_last(page, db_connection)
@@ -210,7 +221,7 @@ def get_last_post(page: int, token: str = Depends(get_token)):
                     detail=str(error)
                 )
 
-@app.post("/vehicle/create", status_code=status.HTTP_201_CREATED)
+@app.post("/api/vehicle/create", status_code=status.HTTP_201_CREATED)
 def post_create_vehicle(vehicle: Vehicle, token: str = Depends(get_token)):
     user_email = token["user_email"]
     try:
@@ -229,7 +240,7 @@ def post_create_vehicle(vehicle: Vehicle, token: str = Depends(get_token)):
                     detail=str(error)
                 )
         
-@app.post("/vehicle/update", status_code=status.HTTP_200_OK)
+@app.post("/api/vehicle/update", status_code=status.HTTP_200_OK)
 def post_create_vehicle(vehicle: Vehicle, token: str = Depends(get_token)):
     user_email = token["user_email"]
     try:
@@ -248,7 +259,7 @@ def post_create_vehicle(vehicle: Vehicle, token: str = Depends(get_token)):
                     detail=str(error)
                 )
         
-@app.post("/vehicle/delete", status_code=status.HTTP_200_OK)
+@app.post("/api/vehicle/delete", status_code=status.HTTP_200_OK)
 def post_create_vehicle(license_plate: str, token: str = Depends(get_token)):
     user_email = token["user_email"]
     try:
@@ -267,7 +278,7 @@ def post_create_vehicle(license_plate: str, token: str = Depends(get_token)):
                     detail=str(error)
                 )
         
-@app.get("/vehicle/get", status_code=status.HTTP_200_OK)
+@app.get("/api/vehicle/get", status_code=status.HTTP_200_OK)
 def get_vehicle_by_license_plate(license_plate: str, token: str = Depends(get_token)):
     try:
         vehicle = get_vehicle(license_plate, db_connection)
@@ -279,7 +290,7 @@ def get_vehicle_by_license_plate(license_plate: str, token: str = Depends(get_to
                     detail=str(error)
                 )
         
-@app.get("/vehicle/getpost", status_code=status.HTTP_200_OK)
+@app.get("/api/vehicle/getpost", status_code=status.HTTP_200_OK)
 def get_vehicle_by_license_plate(post_id: int, token: str = Depends(get_token)):
     try:
         vehicles = get_post_vehicles(post_id, db_connection)

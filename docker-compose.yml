@@ -56,6 +56,9 @@ services:
       - "8080:80"
     volumes:
       - ./apache/app:/usr/local/apache2/htdocs/
+    depends_on:
+      - db
+      - fastapi
 
 volumes:
   docker_mariadb_data:  # Volumen para la persistencia de datos de MariaDB

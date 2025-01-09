@@ -3,55 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Mi Página Web con JavaScript</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-            transition: background-color 0.3s ease;
-        }
-        header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 0;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <title>Compraventa de Vehículos Industriales</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script defer src="js/main.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Bienvenido a Mi Página Web</h1>
-        <p>Haz clic en el botón para cambiar el color de fondo</p>
-    </header>
-    
-    <button onclick="cambiarColor()">Cambiar Color de Fondo</button>
+    <!-- Contenedor principal -->
+    <div class="container">
+        <!-- Encabezado de la página -->
+        <header>
+            <h1>Bienvenido a la Compraventa de Vehículos Industriales</h1>
+        </header>
 
-    <script>
-        // Función que cambia el color de fondo de la página
-        function cambiarColor() {
-            // Colores disponibles
-            const colores = ['#f4f4f4', '#ffcccb', '#d3f9d8', '#b3cde0', '#f7e1ae'];
-            
-            // Selecciona un color aleatorio de la lista
-            const colorAleatorio = colores[Math.floor(Math.random() * colores.length)];
-            
-            // Cambia el color de fondo de la página
-            document.body.style.backgroundColor = colorAleatorio;
-        }
-    </script>
+        <!-- Sección de contenido -->
+        <section id="content">
+            <p>Si ya tienes cuenta, accede con tu token, o regístrate si eres nuevo.</p>
+
+            <!-- Contenido que varía dependiendo de si el usuario está logueado o no -->
+            <div id="contenido"></div> <!-- Este es el contenedor para el contenido dinámico -->
+
+            <!-- Botones de acceso, que solo aparecerán si el usuario no está autenticado -->
+            <div id="auth-buttons"></div> <!-- Este es el contenedor de los botones de login y registro -->
+
+            <!-- Mensaje de usuario logueado, que solo aparecerá si el usuario está autenticado -->
+            <p id="user-message" style="display:none;">¡Hola, <span id="user-name"></span>! Estás conectado.</p>
+        </section>
+    </div>
+
+    <!-- Modal de carga (Opcional) -->
+    <div id="loading" style="display:none;">
+        <p>Cargando...</p>
+    </div>
+
 </body>
 </html>
