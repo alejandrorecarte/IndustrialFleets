@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from controllers.vehicle import create_vehicle
+from controllers.vehicle import create_vehicle, update_vehicle, delete_vehicle, get_vehicle, get_post_vehicles
 from models.vehicle import Vehicle
 from models.post import Post
 from models.user import User
@@ -212,12 +212,83 @@ def get_last_post(page: int, token: str = Depends(get_token)):
 
 @app.post("/vehicle/create", status_code=status.HTTP_201_CREATED)
 def post_create_vehicle(vehicle: Vehicle, token: str = Depends(get_token)):
+    user_email = token["user_email"]
     try:
-        vehicle = create_vehicle(vehicle, db_connection)
+        vehicle = create_vehicle(vehicle, user_email, db_connection)
         return {"vehicle": vehicle.model_dump()}
+    except HTTPException as error:
+        logger.warning(str(error.detail))
+        raise HTTPException(
+                    status_code=error.status_code,
+                    detail=error.detail 
+                )
     except Exception as error:
         logger.warning(str(error))
         raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=str(error)
                 )
+        
+@app.post("/vehicle/update", status_code=status.HTTP_200_OK)
+def post_create_vehicle(vehicle: Vehicle, token: str = Depends(get_token)):
+    user_email = token["user_email"]
+    try:
+        vehicle = update_vehicle(vehicle, user_email, db_connection)
+        return {"vehicle": vehicle.model_dump()}
+    except HTTPException as error:
+        logger.warning(str(error.detail))
+        raise HTTPException(
+                    status_code=error.status_code,
+                    detail=error.detail 
+                )
+    except Exception as error:
+        logger.warning(str(error))
+        raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=str(error)
+                )
+        
+@app.post("/vehicle/delete", status_code=status.HTTP_200_OK)
+def post_create_vehicle(license_plate: str, token: str = Depends(get_token)):
+    user_email = token["user_email"]
+    try:
+        delete_vehicle(license_plate, user_email, db_connection)
+        return {}
+    except HTTPException as error:
+        logger.warning(str(error.detail))
+        raise HTTPException(
+                    status_code=error.status_code,
+                    detail=error.detail 
+                )
+    except Exception as error:
+        logger.warning(str(error))
+        raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=str(error)
+                )
+        
+@app.get("/vehicle/get", status_code=status.HTTP_200_OK)
+def get_vehicle_by_license_plate(license_plate: str, token: str = Depends(get_token)):
+    try:
+        vehicle = get_vehicle(license_plate, db_connection)
+        return {"vehicle" : vehicle.model_dump()}
+    except Exception as error:
+        logger.warning(str(error))
+        raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=str(error)
+                )
+        
+@app.get("/vehicle/getpost", status_code=status.HTTP_200_OK)
+def get_vehicle_by_license_plate(post_id: int, token: str = Depends(get_token)):
+    try:
+        vehicles = get_post_vehicles(post_id, db_connection)
+        vehicles_json = [vehicle.model_dump() for vehicle in vehicles]
+        
+        return {"vehicles" : vehicles_json.model_dump()}
+    except Exception as error:
+        logger.warning(str(error))
+        raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=str(error)
+        )

@@ -1,5 +1,5 @@
 from models.post import Post
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import HTTPException, status
 from controllers.queries import create_post_query, update_post_query, delete_post_query, get_post_query, get_post_last_query ,get_last_id, get_post_last_pages_query, check_post_access_query, get_post_user_query, get_post_user_pages_query
 from controllers.dbmanager import execute_query, execute
 from models.user import User
