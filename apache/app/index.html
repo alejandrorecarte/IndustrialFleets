@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="css/styles.css">
     <script defer src="js/main.js"></script>
 </head>
+
 <body>
     <!-- Contenedor principal -->
     <div class="container">
@@ -19,14 +21,31 @@
         <section id="content">
             <p>Si ya tienes cuenta, accede con tu token, o regístrate si eres nuevo.</p>
 
-            <!-- Contenido que varía dependiendo de si el usuario está logueado o no -->
+            <!-- Contenido dinámico dependiendo del estado de autenticación -->
             <div id="contenido"></div> <!-- Este es el contenedor para el contenido dinámico -->
-
-            <!-- Botones de acceso, que solo aparecerán si el usuario no está autenticado -->
-            <div id="auth-buttons"></div> <!-- Este es el contenedor de los botones de login y registro -->
 
             <!-- Mensaje de usuario logueado, que solo aparecerá si el usuario está autenticado -->
             <p id="user-message" style="display:none;">¡Hola, <span id="user-name"></span>! Estás conectado.</p>
+
+            <table id="postsTable">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Descripción</th>
+                        <th>Imagen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Aquí se llenarán los posts dinámicamente -->
+                </tbody>
+            </table>
+
+            <!-- Botones de acceso, que solo aparecerán si el usuario no está autenticado -->
+            <div id="auth-buttons">
+                <button id="loginBtn">Iniciar sesión</button>
+                <button id="registerBtn">Registrarse</button>
+            </div> <!-- Este es el contenedor de los botones de login y registro -->
+
         </section>
     </div>
 
@@ -36,4 +55,5 @@
     </div>
 
 </body>
+
 </html>

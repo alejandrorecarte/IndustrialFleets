@@ -10,7 +10,7 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     const params = { email, password };
 
     // Construimos la URL con los parámetros codificados
-    const url = `http://localhost:8000/api/login?${new URLSearchParams(params).toString()}`;
+    const url = `/api/login?${new URLSearchParams(params).toString()}`;
 
     // Enviar los datos al backend
     fetch(url, {
