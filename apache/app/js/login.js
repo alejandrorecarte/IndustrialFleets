@@ -1,5 +1,5 @@
 // Obtener el formulario y agregar el evento de submit
-document.getElementById('loginForm').addEventListener('submit', function(event) {
+document.getElementById('form').addEventListener('submit', function(event) {
     event.preventDefault();  // Prevenir el comportamiento por defecto del formulario
 
     // Recoger los datos del formulario
