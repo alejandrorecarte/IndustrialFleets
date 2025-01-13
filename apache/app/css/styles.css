@@ -1,86 +1,55 @@
-header {
-    background-color: #333;
-    color: white;
-    padding: 10px;
-    text-align: center;
-}
-
-#authButtons button {
-    padding: 10px 20px;
-    margin: 5px;
-    cursor: pointer;
-}
-
-#contenido {
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
     padding: 20px;
 }
 
-#volver {
-    color: white;
+.container {
+    max-width: 600px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-#form {
-    height: fit-content;
-    width: fit-content;
-    padding: 20px;
-    margin: 0 auto;
-    margin-top: 150px;
-    border-radius: 25px;
-    color: white;
+h1, h2 {
     text-align: center;
-  
+}
+
+form {
     display: flex;
-    justify-content: center;
     flex-direction: column;
-    align-items: center;
-  
-    backdrop-filter: blur(15px);
-    background-color: rgb(20, 17, 28, 0.8);
-  
 }
 
-#form input{
-    margin-bottom: 15px;
-    text-align: left;
-}
-#formCampos {
-    margin-bottom: 15px;
-    text-align: left;
+label {
+    margin: 10px 0 5px;
 }
 
-#registroFormCamposlabel {
-    display: block;
-    margin-bottom: 5px;
-    margin-left: 10px;
-    font-size: 15px;
- }
-  
-#formCampos input {
-    width: 325px;
-    height: 30px;
+input, textarea {
+    padding: 10px;
+    margin-bottom: 10px;
     border: 1px solid #ccc;
-    border-radius: 15px;
-    padding: 10px 15px;
+    border-radius: 5px;
 }
-  
-#formButton {
-    width: 250px; /* El botón se ajustará al contenido */
-    background-color: hsl(123, 60%, 56%);
-    color: black;
-    font-weight: bold;
-    cursor: pointer;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 20px;
-    
-    /* Agregar flexbox para centrado */
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
 
+button {
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
-  
-#formCampos input[type="submit"]:hover {
-    background-color: #D9D555;
-    color: black;
+
+button:hover {
+    background-color: #218838;
+}
+
+.vehicle-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
 }

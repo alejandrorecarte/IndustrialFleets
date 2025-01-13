@@ -1,38 +1,33 @@
-// Obtener el formulario y agregar el evento de submit
-document.getElementById('loginForm').addEventListener('submit', function(event) {
-    event.preventDefault();  // Prevenir el comportamiento por defecto del formulario
+document.getElementById('addVehicleBtn').addEventListener('click', function() {
+    const make = document.getElementById('make').value;
+    const model = document.getElementById('model').value;
+    const year = document.getElementById('year').value;
+    const price = document.getElementById('price').value;
+    const description = document.getElementById('description').value;
+    const photos = document.getElementById('photos').files;
 
-    // Recoger los datos del formulario
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
+    const vehicleList = document.getElementById('vehicleList');
+    const vehicleItem = document.createElement('div');
+    vehicleItem.classList.add('vehicle-item');
 
-    // Creamos el objeto de parámetros
-    const params = { email, password };
-
-    // Construimos la URL con los parámetros codificados
-    const url = `/api/post/create?${new URLSearchParams(params).toString()}`;
-
-    // Enviar los datos al backend
-    fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            email: email,
-            password: password
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.token) {
-            // Guardar el token de sesión en localStorage
-            localStorage.setItem('token', data.token);
-            window.location.href = '/';  // Redirigir a la página principal
-        } else {
-            alert('Error al iniciar sesión');
+    let photoHTML = '';
+    for (let i = 0; i < photos.length; i++) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            photoHTML += `<img src="${e.target.result}" alt="Foto del vehículo" style="width: 100px; margin: 5px;">`;
+            if (i === photos.length - 1) {
+                vehicleItem.innerHTML = `
+                    <h3>${make} ${model} (${year})</h3>
+                    <p>Precio: $${price}</p>
+                    <p>${description}</p>
+                    <div>${photoHTML}</div>
+                `;
+                vehicleList.appendChild(vehicleItem);
+            }
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Hubo un problema al iniciar sesión');
-    });
+        reader.readAsDataURL(photos[i]);
+    }
+
+    // Limpiar el formulario
+    document.getElementById('vehicleForm').reset();
 });

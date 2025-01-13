@@ -25,7 +25,7 @@ document.getElementById('form').addEventListener('submit', function(event) {
         if (response.ok) {
             window.location.href = '/';  // Redirigir a la página principal
         }else{
-            alert('Hubo un problema al registrarse');
+            alert('Hubo un problema al iniciar sesión');
         }
     })
     .catch(error => {
