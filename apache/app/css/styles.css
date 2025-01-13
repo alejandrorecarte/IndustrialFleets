@@ -58,13 +58,12 @@ header {
 #formCampos input {
     width: 325px;
     height: 30px;
-    padding: 5px;
     border: 1px solid #ccc;
     border-radius: 15px;
     padding: 10px 15px;
 }
   
-#formButton /*[type="submit"]*/ {
+#formButton {
     width: 250px; /* El botón se ajustará al contenido */
     background-color: hsl(123, 60%, 56%);
     color: black;
