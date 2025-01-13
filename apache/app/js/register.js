@@ -25,14 +25,11 @@ document.getElementById('registroForm').addEventListener('submit', function(even
             password: password
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.token) {
-            // Guardar el token de sesión en localStorage
-            localStorage.setItem('token', data.token);
+    .then(response => {
+        if (response.ok) {
             window.location.href = '/';  // Redirigir a la página principal
-        } else {
-            alert('Error al registrarse');
+        }else{
+            alert('Hubo un problema al registrarse');
         }
     })
     .catch(error => {

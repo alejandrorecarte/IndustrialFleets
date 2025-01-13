@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Response, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from controllers.vehicle import create_vehicle, update_vehicle, delete_vehicle, get_vehicle, get_post_vehicles
 from models.vehicle import Vehicle
@@ -14,7 +14,6 @@ import logging
 import time
 
 app = FastAPI()
-security = HTTPBearer()
 
 app.add_middleware(
     CORSMiddleware,
@@ -69,21 +68,21 @@ def init_app():
     except Exception as e:
         logger.error(f"Error in app initialization: {e}")
         return None
-    
-def get_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """
-    Función que extrae el token Bearer del encabezado Authorization.
-    Si no se encuentra o es inválido, se lanza una excepción HTTP.
-    """
-    return verify_token(credentials.credentials)  # Devuelve el token (credentials.credentials)
 
+# Función para obtener el token desde las cookies
+def get_token_from_cookie(request: Request):
+    """
+    Esta función extrae el token de la cookie 'access_token'.
+    Si no se encuentra o es inválido, lanza una excepción HTTP.
+    """
+    access_token = request.cookies.get("access_token")
+    if not access_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token de acceso no encontrado en las cookies"
+        )
+    return verify_token(access_token)  # Devuelve el token si es válido
 
-@app.get("/secure-endpoint")
-def secure_endpoint(token: str = Depends(get_token)):
-    """
-    Endpoint protegido que requiere el token Bearer en la cabecera.
-    """
-    return {"message": "Access granted", "token": token}
 
 @app.on_event("startup")
 async def startup_event():
@@ -100,35 +99,65 @@ async def shutdown_event():
         logger.info("DB connection closed.")
 
 @app.post("/register", status_code=status.HTTP_201_CREATED)
-def post_register(email: str, name: str, surname: str, password: str):
+def post_register(email: str, name: str, surname: str, password: str, response: Response):
     try:
         user = User(email=email, name=name, surname=surname, password=password)
         create_user(user, db_connection)
         access_token = login(email=email, password=password, db_connection=db_connection)
 
-        return {"token": access_token}
+        # Guardar el token en una cookie
+        response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite='Strict')
+        return {"message": "Usuario creado con éxito", "token": access_token}
     except Exception as error:
         logger.warning(str(error))
         raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=str(error)
-                )
-    
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error)
+        )
+
 @app.post("/login", status_code=status.HTTP_202_ACCEPTED)
-def post_login(email: str, password:str):
+def post_login(email: str, password: str, response: Response):
     try:
-        access_token = login(email= email, password=password, db_connection = db_connection)
+        access_token = login(email=email, password=password, db_connection=db_connection)
         if access_token:
-            return {"token": access_token}
+            # Guardar el token en una cookie
+            response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite='Strict')
+            return {"message": "Login exitoso", "token": access_token}
     except Exception as error:
         logger.warning(str(error))
         raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=str(error)
-                )
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error)
+        )
+
+from fastapi.responses import JSONResponse
+
+@app.post("/logout", status_code=status.HTTP_202_ACCEPTED)
+def post_logout(response: Response, request: Request, token: str = Depends(get_token_from_cookie)):
+    try:
+        # Eliminar la cookie "access_token"
+        response.set_cookie(key="access_token", max_age=-1, httponly=True, secure=True, samesite="Strict")
+
+        return {"message": "Logout exitoso, cookie eliminada y token revocado"}
+
+    except Exception as error:
+        logger.warning(str(error))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error)
+        )
+
+
+# Endpoint protegido que obtiene el token desde las cookies
+@app.get("/secure-endpoint")
+def secure_endpoint(request: Request, token: str = Depends(get_token_from_cookie)):
+    """
+    Endpoint protegido que requiere el token desde las cookies.
+    """
+    return {"message": "Access granted", "token": token}
 
 @app.post("/post/create", status_code=status.HTTP_201_CREATED)
-def post_create_post(post: Post, token: str = Depends(get_token)):
+def post_create_post(post: Post, request: Request, token: str = Depends(get_token_from_cookie)):
     post.user_email = token["user_email"]
     try:
         post = create_post(post, db_connection)
@@ -136,12 +165,12 @@ def post_create_post(post: Post, token: str = Depends(get_token)):
     except Exception as error:
         logger.warning(str(error))
         raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=str(error)
-                )
-        
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error)
+        )
+
 @app.post("/post/update", status_code=status.HTTP_200_OK)
-def post_update_post(post: Post, token: str = Depends(get_token)):
+def post_update_post(post: Post, request: Request, token: str = Depends(get_token_from_cookie)):
     user_email = token["user_email"]
     try:
         post = update_post(post, user_email, db_connection)
@@ -149,18 +178,19 @@ def post_update_post(post: Post, token: str = Depends(get_token)):
     except HTTPException as error:
         logger.warning(str(error.detail))
         raise HTTPException(
-                    status_code=error.status_code,
-                    detail=error.detail 
-                )
+            status_code=error.status_code,
+            detail=error.detail
+        )
     except Exception as error:
         logger.warning(str(error))
         raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=str(error)
-                )
-        
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error)
+        )
+
+# Los otros endpoints también se modifican de la misma manera para leer el token desde las cookies
 @app.post("/post/delete", status_code=status.HTTP_200_OK)
-def post_delete_post(post_id: int, token: str = Depends(get_token)):
+def post_delete_post(post_id: int, request: Request, token: str = Depends(get_token_from_cookie)):
     user_email = token["user_email"]
     try:
         delete_post(post_id, user_email, db_connection)
@@ -168,18 +198,19 @@ def post_delete_post(post_id: int, token: str = Depends(get_token)):
     except HTTPException as error:
         logger.warning(str(error.detail))
         raise HTTPException(
-                    status_code=error.status_code,
-                    detail=error.detail 
-                )
+            status_code=error.status_code,
+            detail=error.detail
+        )
     except Exception as error:
         logger.warning(str(error))
         raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=str(error)
-                )
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error)
+        )
+
         
 @app.get("/post/get", status_code=status.HTTP_200_OK)
-def get_post_by_id(post_id: int, token: str = Depends(get_token)):
+def get_post_by_id(post_id: int, request: Request, token: str = Depends(get_token_from_cookie)):
     user_email = token["user_email"]
     try:
         post = get_post(post_id, user_email, db_connection=db_connection)
@@ -192,7 +223,7 @@ def get_post_by_id(post_id: int, token: str = Depends(get_token)):
                 )
         
 @app.get("/post/getuser", status_code=status.HTTP_200_OK)
-def get_user_post(user_email: str, page: int, token: str = Depends(get_token)):
+def get_user_post(user_email: str, page: int, request: Request, token: str = Depends(get_token_from_cookie)):
     try:
         posts = get_post_user(user_email, page, db_connection)
         posts_json = [post.model_dump() for post in posts]
@@ -207,7 +238,7 @@ def get_user_post(user_email: str, page: int, token: str = Depends(get_token)):
                 )
         
 @app.get("/post/getlast", status_code=status.HTTP_200_OK)
-def get_last_post(page: int, token: str = Depends(get_token)):
+def get_last_post(page: int, request: Request, token: str = Depends(get_token_from_cookie)):
     try:
         posts = get_post_last(page, db_connection)
         posts_json = [post.model_dump() for post in posts]
@@ -222,7 +253,7 @@ def get_last_post(page: int, token: str = Depends(get_token)):
                 )
 
 @app.post("/vehicle/create", status_code=status.HTTP_201_CREATED)
-def post_create_vehicle(vehicle: Vehicle, token: str = Depends(get_token)):
+def post_create_vehicle(vehicle: Vehicle, request: Request, token: str = Depends(get_token_from_cookie)):
     user_email = token["user_email"]
     try:
         vehicle = create_vehicle(vehicle, user_email, db_connection)
@@ -241,7 +272,7 @@ def post_create_vehicle(vehicle: Vehicle, token: str = Depends(get_token)):
                 )
         
 @app.post("/vehicle/update", status_code=status.HTTP_200_OK)
-def post_create_vehicle(vehicle: Vehicle, token: str = Depends(get_token)):
+def post_create_vehicle(vehicle: Vehicle, request: Request, token: str = Depends(get_token_from_cookie)):
     user_email = token["user_email"]
     try:
         vehicle = update_vehicle(vehicle, user_email, db_connection)
@@ -260,7 +291,7 @@ def post_create_vehicle(vehicle: Vehicle, token: str = Depends(get_token)):
                 )
         
 @app.post("/vehicle/delete", status_code=status.HTTP_200_OK)
-def post_create_vehicle(license_plate: str, token: str = Depends(get_token)):
+def post_create_vehicle(license_plate: str, request: Request, token: str = Depends(get_token_from_cookie)):
     user_email = token["user_email"]
     try:
         delete_vehicle(license_plate, user_email, db_connection)
@@ -279,7 +310,7 @@ def post_create_vehicle(license_plate: str, token: str = Depends(get_token)):
                 )
         
 @app.get("/vehicle/get", status_code=status.HTTP_200_OK)
-def get_vehicle_by_license_plate(license_plate: str, token: str = Depends(get_token)):
+def get_vehicle_by_license_plate(license_plate: str, request: Request, token: str = Depends(get_token_from_cookie)):
     try:
         vehicle = get_vehicle(license_plate, db_connection)
         return {"vehicle" : vehicle.model_dump()}
@@ -291,7 +322,7 @@ def get_vehicle_by_license_plate(license_plate: str, token: str = Depends(get_to
                 )
         
 @app.get("/vehicle/getpost", status_code=status.HTTP_200_OK)
-def get_vehicle_by_license_plate(post_id: int, token: str = Depends(get_token)):
+def get_vehicle_by_license_plate(post_id: int, request: Request, token: str = Depends(get_token_from_cookie)):
     try:
         vehicles = get_post_vehicles(post_id, db_connection)
         vehicles_json = [vehicle.model_dump() for vehicle in vehicles]
