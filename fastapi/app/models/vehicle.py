@@ -1,5 +1,8 @@
 from enum import Enum
 from pydantic import BaseModel
+from typing import Optional
+from io import BytesIO
+import os
 
 class FuelType(Enum):
     GASOLINE = "Gasoline"
@@ -20,6 +23,6 @@ class Vehicle(BaseModel):
     observations: str
     vehicle_type: VehicleType
     fuel_type: FuelType
-    photo: str
+    photo: Optional[bytes]
     post_id: int
 

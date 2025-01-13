@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, status, Response, Request
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from controllers.vehicle import create_vehicle, update_vehicle, delete_vehicle, get_vehicle, get_post_vehicles
-from models.vehicle import Vehicle
+from models.vehicle import Vehicle, VehicleType, FuelType
 from models.post import Post
 from models.user import User
 from dotenv import load_dotenv
