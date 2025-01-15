@@ -57,7 +57,6 @@ function mostrarPosts(authButtons) {
 function mostrarBotonesLoginRegistro(authButtons) {
     const contenido = document.getElementById('contenido');
     contenido.innerHTML = `
-        <h1>Bienvenido a la compraventa de vehículos industriales</h1>
         <p>Para acceder a todas las funciones, por favor inicia sesión o regístrate.</p>
     `;
 
