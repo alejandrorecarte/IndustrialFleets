@@ -43,7 +43,10 @@ def create_post(post: Post, db_connection) -> Post:
     
     query = get_last_id()
     params = ()
-    results = execute_query(query, params, db_connection)
+    post_id = execute_query(query, params, db_connection)[0][0]
+
+    query = get_post_query()
+    results = execute_query (query, post_id, db_connection)
     
     if results:
         post = post_formatter(results[0])

@@ -159,9 +159,9 @@ def secure_endpoint(request: Request, token: str = Depends(get_token_from_cookie
 
 @app.post("/post/create", status_code=status.HTTP_201_CREATED)
 def post_create_post(title: str, description: str, request: Request, token: str = Depends(get_token_from_cookie)):
-    post.user_email = token["user_email"]
+    user_email = token["user_email"]
     try:
-        post = Post(title = title, description = description)
+        post = Post(title = title, description = description, user_email = user_email)
         post = create_post(post, db_connection)
         return {"post": post.model_dump()}
     except Exception as error:
