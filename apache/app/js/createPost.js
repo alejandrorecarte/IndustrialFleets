@@ -11,14 +11,22 @@ document.getElementById('startAddingVehiclesBtn').addEventListener('click', func
         // Almacenar la información de la flota
         postInfo = { title: title, description: description };
 
-        // Ocultar el formulario de flota y mostrar el formulario de vehículos
-        document.getElementById('fleetInfo').style.display = 'none';
-        document.getElementById('vehicleFormSection').style.display = 'block';
-        document.getElementById('uploadVehiclesBtn').style.display = 'inline-block'; // Mostrar botón para subir vehículos
-    } else {
-        alert("Por favor, ingrese un título y descripción para la flota.");
-    }
-});
+                // Ocultar el formulario de flota y mostrar el formulario de vehículos
+                document.getElementById('fleetInfo').style.display = 'none';
+                document.getElementById('vehicleFormSection').style.display = 'block';
+                document.getElementById('uploadVehiclesBtn').style.display = 'inline-block'; // Mostrar botón para subir vehículos
+            } else {
+                alert("Por favor, ingrese un título y descripción para la flota.");
+            }
+        });
+                // Ocultar el formulario de flota y mostrar el formulario de vehículos
+                document.getElementById('fleetInfo').style.display = 'none';
+                document.getElementById('vehicleFormSection').style.display = 'block';
+                document.getElementById('uploadVehiclesBtn').style.display = 'inline-block'; // Mostrar botón para subir vehículos
+            } else {
+                alert("Por favor, ingrese un título y descripción para la flota.");
+            }
+        });
 
 // Botón para añadir vehículo
 document.getElementById('addVehicleBtn').addEventListener('click', function () {
@@ -58,37 +66,64 @@ document.getElementById('addVehicleBtn').addEventListener('click', function () {
         }));
     }
 
-    // Después de que todas las fotos se hayan cargado, agregar el vehículo a la flota
-    Promise.all(readerPromises).then(() => {
-        // Añadir el vehículo a la lista visual
-        const vehicleList = document.getElementById('vehicleList');
-        const vehicleDiv = document.createElement('div');
-        vehicleDiv.classList.add('vehicle-item');
+            // Después de que todas las fotos se hayan cargado, agregar el vehículo a la flota
+            Promise.all(readerPromises).then(() => {
+                // Añadir el vehículo a la lista visual
+                const vehicleList = document.getElementById('vehicleList');
+                const vehicleDiv = document.createElement('div');
+                vehicleDiv.classList.add('vehicle-item');
+            // Después de que todas las fotos se hayan cargado, agregar el vehículo a la flota
+            Promise.all(readerPromises).then(() => {
+                // Añadir el vehículo a la lista visual
+                const vehicleList = document.getElementById('vehicleList');
+                const vehicleDiv = document.createElement('div');
+                vehicleDiv.classList.add('vehicle-item');
 
-        let photoHTML = '';
-        vehicleItem.photos.forEach(photo => {
-            photoHTML += `<img src="${photo}" alt="Foto del vehículo" style="width: 100px; margin: 5px;">`;
+                let photoHTML = '';
+                vehicleItem.photos.forEach(photo => {
+                    photoHTML += `<img src="${photo}" alt="Foto del vehículo" style="width: 100px; margin: 5px;">`;
+                });
+                let photoHTML = '';
+                vehicleItem.photos.forEach(photo => {
+                    photoHTML += `<img src="${photo}" alt="Foto del vehículo" style="width: 100px; margin: 5px;">`;
+                });
+
+                vehicleDiv.innerHTML = `
+                    <h3>${vehicleItem.make} ${vehicleItem.model} (${vehicleItem.year})</h3>
+                    <p>Precio: $${vehicleItem.price}</p>
+                    <p>${vehicleItem.description}</p>
+                    <p>Tipo de Vehículo: ${vehicleItem.vehicleType}</p>
+                    <p>Combustible: ${vehicleItem.fuelType}</p>
+                    <div>${photoHTML}</div>
+                `;
+                vehicleList.appendChild(vehicleDiv);
+                vehicleDiv.innerHTML = `
+                    <h3>${vehicleItem.make} ${vehicleItem.model} (${vehicleItem.year})</h3>
+                    <p>Precio: $${vehicleItem.price}</p>
+                    <p>${vehicleItem.description}</p>
+                    <p>Tipo de Vehículo: ${vehicleItem.vehicleType}</p>
+                    <p>Combustible: ${vehicleItem.fuelType}</p>
+                    <div>${photoHTML}</div>
+                `;
+                vehicleList.appendChild(vehicleDiv);
+
+                // Añadir el vehículo al array de la flota
+                vehicles.push(vehicleItem);
+                // Añadir el vehículo al array de la flota
+                vehicles.push(vehicleItem);
+
+                // Limpiar el formulario
+                document.getElementById('vehicleForm').reset();
+            }).catch(err => {
+                console.error('Error al cargar las fotos:', err);
+            });
         });
-
-        vehicleDiv.innerHTML = `
-            <h3>${vehicleItem.make} ${vehicleItem.model} (${vehicleItem.year})</h3>
-            <p>Precio: $${vehicleItem.price}</p>
-            <p>${vehicleItem.description}</p>
-            <p>Tipo de Vehículo: ${vehicleItem.vehicleType}</p>
-            <p>Combustible: ${vehicleItem.fuelType}</p>
-            <div>${photoHTML}</div>
-        `;
-        vehicleList.appendChild(vehicleDiv);
-
-        // Añadir el vehículo al array de la flota
-        vehicles.push(vehicleItem);
-
-        // Limpiar el formulario
-        document.getElementById('vehicleForm').reset();
-    }).catch(err => {
-        console.error('Error al cargar las fotos:', err);
-    });
-});
+                // Limpiar el formulario
+                document.getElementById('vehicleForm').reset();
+            }).catch(err => {
+                console.error('Error al cargar las fotos:', err);
+            });
+        });
 
 // Botón para subir todos los vehículos
 document.getElementById('uploadVehiclesBtn').addEventListener('click', function () {
