@@ -46,7 +46,7 @@ def create_post(post: Post, db_connection) -> Post:
     results = execute_query(query, params, db_connection)
     
     if results:
-        post.post_id = results[0][0]
+        post = post_formatter(results[0])
         return post
     else:
         raise ControlledException("Could not create the post into BBDD")

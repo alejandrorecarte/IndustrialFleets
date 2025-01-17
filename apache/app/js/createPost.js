@@ -1,15 +1,15 @@
 // Array para almacenar los vehículos
 let vehicles = [];
-let fleetInfo = {}; // Objeto para almacenar la información de la flota
+let postInfo = {}; // Objeto para almacenar la información de la flota
 
 // Botón para iniciar el proceso de agregar vehículos
-document.getElementById('startAddingVehiclesBtn').addEventListener('click', function() {
-    const fleetTitle = document.getElementById('fleetTitle').value;
-    const fleetDescription = document.getElementById('fleetDescription').value;
+document.getElementById('startAddingVehiclesBtn').addEventListener('click', function () {
+    const title = document.getElementById('fleetTitle').value;
+    const description = document.getElementById('fleetDescription').value;
 
-    if (fleetTitle && fleetDescription) {
+    if (title && description) {
         // Almacenar la información de la flota
-        fleetInfo = { title: fleetTitle, description: fleetDescription };
+        postInfo = { title: title, description: description };
 
         // Ocultar el formulario de flota y mostrar el formulario de vehículos
         document.getElementById('fleetInfo').style.display = 'none';
@@ -21,9 +21,9 @@ document.getElementById('startAddingVehiclesBtn').addEventListener('click', func
 });
 
 // Botón para añadir vehículo
-document.getElementById('addVehicleBtn').addEventListener('click', function() {
-    const make = document.getElementById('make').value;
-    const model = document.getElementById('model').value;
+document.getElementById('addVehicleBtn').addEventListener('click', function () {
+    const license_plate = document.getElementById('license_plate')
+    const brand = document.getElementById('brand').value;
     const year = document.getElementById('year').value;
     const price = document.getElementById('price').value;
     const description = document.getElementById('description').value;
@@ -33,7 +33,8 @@ document.getElementById('addVehicleBtn').addEventListener('click', function() {
 
     // Crear el objeto del vehículo
     const vehicleItem = {
-        make,
+        license_plate,
+        brand,
         model,
         year,
         price,
@@ -48,7 +49,7 @@ document.getElementById('addVehicleBtn').addEventListener('click', function() {
     for (const element of photos) {
         const reader = new FileReader();
         readerPromises.push(new Promise((resolve, reject) => {
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 vehicleItem.photos.push(e.target.result);
                 resolve();
             };
@@ -90,31 +91,39 @@ document.getElementById('addVehicleBtn').addEventListener('click', function() {
 });
 
 // Botón para subir todos los vehículos
-document.getElementById('uploadVehiclesBtn').addEventListener('click', function() {
+document.getElementById('uploadVehiclesBtn').addEventListener('click', function () {
     // Combinar la información de la flota con los vehículos
-    const fleetData = {
-        ...fleetInfo,
+    const vehicles = {
+        ...postInfo,
         vehicles: vehicles
     };
 
     // Simular el envío de datos (por ejemplo, a una API)
-    console.log('Enviando la flota:', fleetData);
+    console.log('Enviando la flota:', vehicles);
 
     // Aquí puedes hacer un POST real con fetch o axios
-    /*
-    fetch('/api/submitFleet', {
+    // Creamos el objeto de parámetros
+
+    // Construimos la URL con los parámetros codificados
+    const url = `/api/post/create?${new URLSearchParams(postInfo).toString()}`;
+
+    fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(fleetData),
+        body: JSON.stringify(vehicles),
     })
-    .then(response => response.json())
-    .then(data => {
-        alert('Flota enviada con éxito');
-    })
-    .catch((error) => {
-        console.error('Error al enviar la flota:', error);
-    });
-    */
+        .then(response => response.json())
+        .then(data => {
+            var postId = data.id
+            for (const vehicle in vehicles) {
+                vehicleParams = vehicle
+
+                const url = `/api/vehicle/create?${new URLSearchParams(vehicleParams).toString()}`;
+            }
+        })
+        .catch((error) => {
+            console.error('Error al enviar la flota:', error);
+        });
 });

@@ -1,40 +1,59 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Venta de Vehículos</title>
+    <title>Compraventa de Vehículos Industriales</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script defer src="js/main.js"></script>
 </head>
+
 <body>
+    <!-- Contenedor principal -->
     <div class="container">
-        <h1>Sube tu Vehículo para Vender</h1>
-        <form id="vehicleForm">
-            <label for="make">Marca:</label>
-            <input type="text" id="make" required>
+        <!-- Encabezado de la página -->
+        <header>
+            <h1>Bienvenido a la Compraventa de Vehículos Industriales</h1>
+        </header>
 
-            <label for="model">Modelo:</label>
-            <input type="text" id="model" required>
+        <!-- Sección de contenido -->
+        <section id="content">
+            <p>Si ya tienes cuenta, accede con tu token, o regístrate si eres nuevo.</p>
 
-            <label for="year">Año:</label>
-            <input type="number" id="year" required>
+            <!-- Contenido dinámico dependiendo del estado de autenticación -->
+            <div id="contenido"></div> <!-- Este es el contenedor para el contenido dinámico -->
 
-            <label for="price">Precio:</label>
-            <input type="number" id="price" required>
+            <!-- Mensaje de usuario logueado, que solo aparecerá si el usuario está autenticado -->
+            <p id="user-message" style="display:none;">¡Hola, <span id="user-name"></span>! Estás conectado.</p>
 
-            <label for="description">Descripción:</label>
-            <textarea id="description" required></textarea>
+            <table id="postsTable">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Descripción</th>
+                        <th>Imagen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Aquí se llenarán los posts dinámicamente -->
+                </tbody>
+            </table>
 
-            <label for="photos">Sube fotos del vehículo:</label>
-            <input type="file" id="photos" accept="image/*" multiple>
+            <!-- Botones de acceso, que solo aparecerán si el usuario no está autenticado -->
+            <div id="auth-buttons">
+                <button id="loginBtn">Iniciar sesión</button>
+                <button id="registerBtn">Registrarse</button>
+            </div> <!-- Este es el contenedor de los botones de login y registro -->
 
-            <button type="button" id="addVehicleBtn">Agregar Vehículo</button>
-        </form>
-
-        <h2>Vehículos Disponibles</h2>
-        <div id="vehicleList"></div>
+        </section>
     </div>
 
-    <script src="js/createPost.js"></script>
+    <!-- Modal de carga (Opcional) -->
+    <div id="loading" style="display:none;">
+        <p>Cargando...</p>
+    </div>
+
 </body>
+
 </html>

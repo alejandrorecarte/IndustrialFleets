@@ -5,21 +5,28 @@ from io import BytesIO
 import os
 
 class FuelType(Enum):
-    GASOLINE = "Gasoline"
-    DIESEL = "Diesel"
-    ELECTRIC = "Electric"
-    HYBRID = "Hybrid"
+    GASOLINE = "Gasolina"
+    DIESEL = "Diésel"
+    ELECTRIC = "Eléctrico"
+    HYBRID = "Híbrido"
 
 class VehicleType(Enum):
-    CAR = "Car"
-    TRUCK = "Truck"
-    MOTORCYCLE = "Motorcycle"
+    CAR = "Coche"
+    TRUCK = "Camión"
+    MOTORCYCLE = "Motocicleta"
     BUS = "Bus"
+    FORK_LIFT = "Carretilla elevadora"
+    CRANE_TRUCK = "Camión con grúa"
+    CEMENT_TRUCK = "Camión de cemento"
+    TBM = "Tuneladora"
 
 # Modelo de vehículo con Pydantic
 class Vehicle(BaseModel):
     license_plate: str
+    brand: str
+    model: str
     registration_year: int
+    price: float
     observations: str
     vehicle_type: VehicleType
     fuel_type: FuelType

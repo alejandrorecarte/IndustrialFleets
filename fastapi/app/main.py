@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Response, Request
+from fastapi import FastAPI, Depends, HTTPException, status, Response, Request, File, UploadFile
 from controllers.vehicle import create_vehicle, update_vehicle, delete_vehicle, get_vehicle, get_post_vehicles
 from models.vehicle import Vehicle, VehicleType, FuelType
 from models.post import Post
@@ -8,9 +8,11 @@ from starlette.middleware.cors import CORSMiddleware
 from controllers.dbmanager import connect_to_db, close_connection
 from controllers.user import create_user, login, verify_token
 from controllers.post import create_post, update_post, delete_post, get_post, get_post_last, get_post_user, get_post_user_pages, get_post_last_pages
+from typing import Optional
 import os
 import logging
 import time
+import base64
 
 app = FastAPI()
 
@@ -156,9 +158,10 @@ def secure_endpoint(request: Request, token: str = Depends(get_token_from_cookie
     return {"message": "Access granted", "token": token}
 
 @app.post("/post/create", status_code=status.HTTP_201_CREATED)
-def post_create_post(post: Post, request: Request, token: str = Depends(get_token_from_cookie)):
+def post_create_post(title: str, description: str, request: Request, token: str = Depends(get_token_from_cookie)):
     post.user_email = token["user_email"]
     try:
+        post = Post(title = title, description = description)
         post = create_post(post, db_connection)
         return {"post": post.model_dump()}
     except Exception as error:
@@ -252,26 +255,68 @@ def get_last_post(page: int, request: Request, token: str = Depends(get_token_fr
                 )
 
 @app.post("/vehicle/create", status_code=status.HTTP_201_CREATED)
-def post_create_vehicle(vehicle: Vehicle, request: Request, token: str = Depends(get_token_from_cookie)):
+def post_create_vehicle(
+    license_plate: str,
+    brand: str,
+    model: str,
+    registration_year: int,
+    price: float,
+    observations: str,
+    vehicle_type: VehicleType,
+    fuel_type: FuelType,
+    post_id: int,
+    request: Request,
+    photo: UploadFile = File(...),  # Recibimos la foto como archivo
+    token: str = Depends(get_token_from_cookie)  # Dependencia para obtener el token
+):
     user_email = token["user_email"]
+    
     try:
+        # Leemos la foto como bytes
+        photo_bytes = None
+        if photo:
+            photo_bytes = photo.file.read()  # Lee el archivo y lo convierte en bytes
+        
+        # Convertimos los bytes de la foto a base64
+        photo_base64 = None
+        if photo_bytes:
+            photo_base64 = base64.b64encode(photo_bytes).decode("utf-8")
+        
+        # Crear el objeto Vehicle
+        vehicle = Vehicle(
+            license_plate=license_plate,
+            brand=brand,
+            model=model,
+            registration_year=registration_year,
+            price=price,
+            observations=observations,
+            vehicle_type=vehicle_type,
+            fuel_type=fuel_type,
+            post_id = post_id,
+            photo=photo_base64  # Asignamos la foto codificada en base64
+        )
+        
+        # Aquí llamas a la función de creación de vehículo
         vehicle = create_vehicle(vehicle, user_email, db_connection)
+        
+        # Retornamos la respuesta
         return {"vehicle": vehicle.model_dump()}
+    
     except HTTPException as error:
         logger.warning(str(error.detail))
         raise HTTPException(
-                    status_code=error.status_code,
-                    detail=error.detail 
-                )
+            status_code=error.status_code,
+            detail=error.detail
+        )
     except Exception as error:
         logger.warning(str(error))
         raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=str(error)
-                )
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error)
+        )
         
 @app.post("/vehicle/update", status_code=status.HTTP_200_OK)
-def post_create_vehicle(vehicle: Vehicle, request: Request, token: str = Depends(get_token_from_cookie)):
+def post_update_vehicle(vehicle: Vehicle, request: Request, token: str = Depends(get_token_from_cookie)):
     user_email = token["user_email"]
     try:
         vehicle = update_vehicle(vehicle, user_email, db_connection)
@@ -290,7 +335,7 @@ def post_create_vehicle(vehicle: Vehicle, request: Request, token: str = Depends
                 )
         
 @app.post("/vehicle/delete", status_code=status.HTTP_200_OK)
-def post_create_vehicle(license_plate: str, request: Request, token: str = Depends(get_token_from_cookie)):
+def post_delete_vehicle(license_plate: str, request: Request, token: str = Depends(get_token_from_cookie)):
     user_email = token["user_email"]
     try:
         delete_vehicle(license_plate, user_email, db_connection)

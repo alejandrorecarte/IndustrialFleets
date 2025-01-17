@@ -17,7 +17,10 @@ CREATE TABLE Posts (
 
 CREATE TABLE Vehicles (
   license_plate varchar(20) PRIMARY KEY,
+  brand varchar(20),
+  model varchar(20),
   registration_year INT(4) NOT NULL,
+  price DOUBLE,
   observations varchar(1000),
   vehicle_type varchar(25) NOT NULL,
   fuel_type varchar(25) NOT NULL,

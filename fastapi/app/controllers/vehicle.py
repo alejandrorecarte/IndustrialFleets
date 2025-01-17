@@ -26,12 +26,15 @@ def vehicle_formatter(vehicle_nf):
     
     vehicle = Vehicle(
         license_plate=vehicle_nf[0],
-        registration_year=vehicle_nf[1],
-        observations=vehicle_nf[2],
-        vehicle_type=VehicleType(vehicle_nf[3].split(".")[1].capitalize()),
-        fuel_type=FuelType(vehicle_nf[4].split(".")[1].capitalize()),
-        photo=vehicle_nf[5],
-        post_id=vehicle_nf[6]
+        brand = vehicle_nf[1],
+        model = vehicle_nf[2],
+        registration_year=vehicle_nf[3],
+        price = vehicle_nf[4],
+        observations=vehicle_nf[5],
+        vehicle_type=VehicleType(vehicle_nf[6].split(".")[1].capitalize()),
+        fuel_type=FuelType(vehicle_nf[7].split(".")[1].capitalize()),
+        photo=vehicle_nf[8],
+        post_id=vehicle_nf[9]
     )
     return vehicle
 
@@ -39,7 +42,7 @@ def create_vehicle(vehicle: Vehicle, user_email, db_connection):
     check_post_access(user_email, vehicle.post_id, db_connection)
 
     query = create_vehicle_query()
-    params = (vehicle.license_plate, vehicle.registration_year, vehicle.observations, vehicle.vehicle_type, vehicle.fuel_type, vehicle.photo, vehicle.post_id)
+    params = (vehicle.license_plate, vehicle.brand, vehicle.model, vehicle.registration_year, vehicle.price, vehicle.observations, vehicle.vehicle_type, vehicle.fuel_type, vehicle.photo, vehicle.post_id)
     
     execute(query, params, db_connection)
     
@@ -49,7 +52,7 @@ def update_vehicle(vehicle: Vehicle, user_email: str, db_connection):
     check_vehicle_access(user_email, vehicle.license_plate, db_connection)
     
     query = update_vehicle_query()
-    params = (vehicle.registration_year, vehicle.observations, vehicle.vehicle_type, vehicle.fuel_type, vehicle.photo, vehicle.license_plate)
+    params = (vehicle.brand, vehicle.model, vehicle.registration_year, vehicle.price, vehicle.observations, vehicle.vehicle_type, vehicle.fuel_type, vehicle.photo, vehicle.license_plate)
     
     execute(query, params, db_connection)
     
