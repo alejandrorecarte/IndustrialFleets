@@ -129,14 +129,20 @@ document.getElementById('uploadVehiclesForm').addEventListener('submit', functio
         vehicles: vehicles
     };
 
-    // Construir la URL para la subida de vehículos
-    const url = '/api/vehicle/create';
+    // Crear los parámetros a enviar en la URL
+    const params = {
+        ...postInfo, // Información de la flota
+        vehicles: JSON.stringify(vehicles) // Los vehículos como JSON codificado
+    };
 
-    // Enviar los datos al backend
+    // Construir la URL con los parámetros codificados
+    const url = `/api/vehicle/create/?${new URLSearchParams(params).toString()}`;
+
+    // Enviar los datos al backend en el cuerpo de la solicitud
     fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(fleetData)
+        body: JSON.stringify(fleetData) // Enviar la flota y vehículos como JSON
     })
     .then(response => {
         if (response.ok) {
