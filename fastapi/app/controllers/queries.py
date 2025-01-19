@@ -1,6 +1,6 @@
 #USER
-def create_user_query():
-    return "INSERT INTO Users (email, name, surname, hashed_password) VALUES (%s, %s, %s, %s);"
+def register_query():
+    return "INSERT INTO Users (email, name, last_name, hashed_password) VALUES (%s, %s, %s, %s);"
 
 def login_query():
     return "SELECT * FROM Users WHERE email LIKE %s;"
@@ -41,10 +41,10 @@ def check_vehicle_access_query():
     return "SELECT p.user_email FROM Vehicles v INNER JOIN Posts p ON v.post_id = p.post_id WHERE v.license_plate LIKE %s"
 
 def create_vehicle_query():
-    return "INSERT INTO Vehicles (license_plate, registration_year, observations, vehicle_type, fuel_type, photo, post_id) VALUES (%s, %s, %s, %s, %s, %s, %s);"
+    return "INSERT INTO Vehicles (license_plate, brand, model, registration_year, price, observations, vehicle_type, fuel_type, photo, post_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
 
 def update_vehicle_query():
-    return "UPDATE Vehicles SET registration_year = %s, observations = %s, vehicle_type = %s, fuel_type = %s, photo = %s WHERE license_plate LIKE %s"
+    return "UPDATE Vehicles SET brand = %s, model = %s, registration_year = %s, price = %s observations = %s, vehicle_type = %s, fuel_type = %s, photo = %s WHERE license_plate LIKE %s"
 
 def delete_vehicle_query():
     return "DELETE FROM Vehicles WHERE license_plate LIKE %s"
@@ -53,4 +53,4 @@ def get_vehicle_query():
     return ("SELECT * FROM Vehicles WHERE license_plate LIKE %s")
 
 def get_post_vehicles_query():
-    return ("SELECT v.license_plate, v.registration_year, v.observations, v.vehicle_type, v.fuel_type, v.photo, v.post_id FROM Vehicles v INNER JOIN Posts p ON v.post_id = p.post_id WHERE v.post_id LIKE %s")
+    return ("SELECT v.license_plate, v.brand, v.model, v.registration_year, v.price, v.observations, v.vehicle_type, v.fuel_type, v.photo, v.post_id FROM Vehicles v INNER JOIN Posts p ON v.post_id = p.post_id WHERE v.post_id LIKE %s")

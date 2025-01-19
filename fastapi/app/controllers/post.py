@@ -1,7 +1,7 @@
 from models.post import Post
 from fastapi import HTTPException, status
 from controllers.queries import create_post_query, update_post_query, delete_post_query, get_post_query, get_post_last_query ,get_last_id, get_post_last_pages_query, check_post_access_query, get_post_user_query, get_post_user_pages_query
-from controllers.dbmanager import execute_query, execute
+from database import execute_query, execute
 from models.user import User
 from controllers.exceptions import ControlledException
 import os
@@ -43,10 +43,13 @@ def create_post(post: Post, db_connection) -> Post:
     
     query = get_last_id()
     params = ()
-    results = execute_query(query, params, db_connection)
+    post_id = execute_query(query, params, db_connection)[0][0]
+
+    query = get_post_query()
+    results = execute_query (query, post_id, db_connection)
     
     if results:
-        post.post_id = results[0][0]
+        post = post_formatter(results[0])
         return post
     else:
         raise ControlledException("Could not create the post into BBDD")

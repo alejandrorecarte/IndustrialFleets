@@ -5,14 +5,11 @@ document.getElementById('form').addEventListener('submit', function(event) {
     // Recoger los datos del formulario
     const email = document.getElementById('email').value;
     const name = document.getElementById('name').value;
-    const surname = document.getElementById('surname').value;
+    const last_name = document.getElementById('surname').value;
     const password = document.getElementById('password').value;
 
-    // Creamos el objeto de parámetros
-    const params = { email, name, surname, password };
-
     // Construimos la URL con los parámetros codificados
-    const url = `/api/register?${new URLSearchParams(params).toString()}`;
+    const url = `/api/users/register`;
 
     // Enviar los datos al backend
     fetch(url, {
@@ -21,7 +18,7 @@ document.getElementById('form').addEventListener('submit', function(event) {
         body: JSON.stringify({
             email: email,
             name: name,
-            surname: surname,
+            last_name: last_name,
             password: password
         })
     })

@@ -4,7 +4,7 @@ from utils import hash
 class User(BaseModel):
     email: str
     name: str
-    surname: str
+    last_name: str
     password: str
     hashed_password: str = None  # Este atributo será generado automáticamente
 

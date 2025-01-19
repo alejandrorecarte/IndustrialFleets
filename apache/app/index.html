@@ -4,49 +4,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compraventa de Vehículos Industriales</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <script defer src="js/main.js"></script>
+    <link rel="stylesheet" href="css/index.css"> <!-- Asegúrate de que la ruta sea correcta -->
 </head>
 
 <body>
-    <!-- Contenedor principal -->
-    <div class="container">
-        <!-- Encabezado de la página -->
-        <header>
-            <h1>Bienvenido a la Compraventa de Vehículos Industriales</h1>
-        </header>
 
-        <!-- Sección de contenido -->
-        <section id="content">
-            <p>Si ya tienes cuenta, accede con tu token, o regístrate si eres nuevo.</p>
+    <h1>Compraventa de Industrial Fleets</h1>
 
-            <!-- Contenido dinámico dependiendo del estado de autenticación -->
-            <div id="contenido"></div> <!-- Este es el contenedor para el contenido dinámico -->
+    <!-- Información del usuario -->
+    <div id="userInfo">
+        <h2>Si ya tienes cuenta, accede con tu token, o regístrate si eres nuevo.</h2>
+        
+        <!-- Contenedor para el contenido dinámico de autenticación -->
+        <div id="contenido"></div>
 
-            <!-- Mensaje de usuario logueado, que solo aparecerá si el usuario está autenticado -->
-            <p id="user-message" style="display:none;">¡Hola, <span id="user-name"></span>! Estás conectado.</p>
+        <!-- Mensaje para usuarios autenticados -->
+        <p id="user-message" style="display:none;">
+            ¡Hola, <span id="user-name"></span>! Estás conectado.
+        </p>
 
-            <table id="postsTable">
-                <thead>
-                    <tr>
-                        <th>Título</th>
-                        <th>Descripción</th>
-                        <th>Imagen</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Aquí se llenarán los posts dinámicamente -->
-                </tbody>
-            </table>
+        <!-- Tabla de vehículos -->
+        <table id="postsTable">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Descripción</th>
+                    <th>Imagen</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Los posts se llenarán dinámicamente aquí -->
+            </tbody>
+        </table>
 
-            <!-- Botones de acceso, que solo aparecerán si el usuario no está autenticado -->
-            <div id="auth-buttons">
-                <button id="loginBtn">Iniciar sesión</button>
-                <button id="registerBtn">Registrarse</button>
-            </div> <!-- Este es el contenedor de los botones de login y registro -->
-
-        </section>
+        <!-- Botones de acceso para usuarios no autenticados -->
+        <div id="auth-buttons">
+            <button id="loginBtn">Iniciar sesión</button>
+            <button id="registerBtn">Registrarse</button>
+        </div>
     </div>
 
     <!-- Modal de carga (Opcional) -->
@@ -54,6 +49,7 @@
         <p>Cargando...</p>
     </div>
 
+    <script src="js/main.js"></script> <!-- Si necesitas un archivo JS, asegura su existencia y funcionalidad -->
 </body>
 
 </html>

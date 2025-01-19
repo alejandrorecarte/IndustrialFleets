@@ -6,11 +6,8 @@ document.getElementById('form').addEventListener('submit', function(event) {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-    // Creamos el objeto de parámetros
-    const params = { email, password };
-
     // Construimos la URL con los parámetros codificados
-    const url = `/api/login?${new URLSearchParams(params).toString()}`;
+    const url = `/api/users/login`;
 
     // Enviar los datos al backend
     fetch(url, {
@@ -23,9 +20,9 @@ document.getElementById('form').addEventListener('submit', function(event) {
     })
     .then(response => {
         if (response.ok) {
-            window.location.href = '/';  // Redirigir a la página principal
+            window.location.href = '/';
         }else{
-            alert('Hubo un problema al registrarse');
+            alert('Hubo un problema al iniciar sesión');
         }
     })
     .catch(error => {
