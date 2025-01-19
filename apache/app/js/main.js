@@ -3,6 +3,8 @@ function verificarSesion() {
     const token = getCookie('access_token'); // Obtener el token de la cookie
     const authButtons = document.getElementById('auth-buttons');  // Cambié el ID a 'auth-buttons' según el HTML.
 
+    ocultarMostrarCreatePostButton();
+
     if (token === null) {
         mostrarBotonesLoginRegistro(authButtons)
         console.log("No cookies")
@@ -16,6 +18,7 @@ function verificarSesion() {
                 if (response.ok) {
                     // Si la respuesta es OK (status 200), el token es válido
                     mostrarPosts(authButtons);  // Mostrar los posts si está autenticado
+                    ocultarMostrarCreatePostButton();
                     console.log("Cookie verified")
                 } else {
                     // Si la respuesta no es OK (por ejemplo, token inválido o expirado), mostrar los botones de login
@@ -66,6 +69,36 @@ function mostrarBotonesLoginRegistro(authButtons) {
         <button onclick="irRegistro()">Registrarse</button>
     `;
 }
+
+function ocultarMostrarCreatePostButton() {
+    const createPostButton = document.getElementById('createPostButton');
+    const token = getCookie('access_token'); // Obtenemos el token de las cookies
+
+    if (token === null) {
+        createPostButton.style.visibility = 'visible';
+        createPostButton.style.display = 'block';
+    } else {
+        fetch('/api/secure-endpoint', {
+            method: 'GET'
+        })
+        .then(response => {
+            if (response.ok) {
+                createPostButton.style.visibility = 'visible';
+                createPostButton.style.display = 'block';
+            } else {
+                createPostButton.style.visibility = 'hidden';
+                createPostButton.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            console.error('Error al verificar el token:', error);
+            createPostButton.style.visibility = 'visible';
+            createPostButton.style.display = 'block';
+        });
+    }
+}
+
+
 
 // Redirigir a la página de Login
 function irLogin() {

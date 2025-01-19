@@ -79,6 +79,27 @@ h1 {
     border-radius: 10px;
 }
 
+
+/****************************************************/
+/****************************************************/
+#createPostButton {
+    margin-top: 20px;
+    background-color: #ff7e5f;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 45%;
+    margin: 10px;
+}
+/****************************************************/
+/****************************************************/
+
+
+
 /* Buttons for Login and Register */
 #auth-buttons {
     margin-top: 20px;
