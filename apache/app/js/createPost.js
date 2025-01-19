@@ -1,3 +1,7 @@
+// Inicializa el array de vehículos y el objeto de información de la flota
+let vehicles = [];
+let postInfo = {}; // Asegúrate de que postInfo contenga la información necesaria
+
 // Obtener el formulario y agregar el evento de submit para la creación de la flota
 document.getElementById('fleetForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
@@ -13,39 +17,10 @@ document.getElementById('fleetForm').addEventListener('submit', function(event) 
     }
 
     // Crear el objeto de parámetros
-    const params = { title, description };
-
-    // Construir la URL con los parámetros codificados
-    const url = `/api/post/create/?${new URLSearchParams(params).toString()}`;
-
-    // Enviar los datos al backend
-    fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params),
-    })
-        .then(response => {
-            if (response.ok) {
-                alert('Flota creada con éxito.');
-                document.getElementById('vehicleFormSection').style.display = 'block';
-                document.getElementById('uploadVehiclesForm').style.display = 'block'; // Mostrar el formulario para subir vehículos
-                return response.json();
-            } else {
-                throw new Error('Error al crear la flota.');
-            }
-        })
-        .then(data => {
-            window.fleetId = data.id; // Guardar el ID de la flota si es necesario
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Hubo un problema al crear la flota.');
-        });
+    postInfo = { title, description };
+    document.getElementById('vehicleFormSection').style.display = 'block';
+    document.getElementById('uploadVehiclesForm').style.display = 'block'; // Mostrar el formulario para subir vehículos
 });
-
-// Inicializa el array de vehículos y el objeto de información de la flota
-let vehicles = [];
-let postInfo = {}; // Asegúrate de que postInfo contenga la información necesaria
 
 // Botón para añadir vehículo
 document.getElementById('addVehicleBtn').addEventListener('click', function () {
@@ -58,7 +33,7 @@ document.getElementById('addVehicleBtn').addEventListener('click', function () {
         const observations = document.getElementById('observations').value;
         const vehicleType = document.getElementById('vehicleType').value;
         const fuelType = document.getElementById('fuelType').value;
-        const photo = document.getElementById('photo').files[0]; // Solo un archivo
+        const photo = document.getElementById('photo').files[0]; // Asegúrate de obtener el archivo como tal
 
         // Validar campos requeridos
         if (!license_plate || !brand || !model || !registration_year || !price || !observations || !vehicleType || !fuelType || !photo) {
@@ -75,16 +50,11 @@ document.getElementById('addVehicleBtn').addEventListener('click', function () {
             observations,
             vehicleType,
             fuelType,
-            photo: null // Inicialmente, la foto será null
+            photo // Guardamos el archivo directamente aquí, no base64
         };
 
-        // Procesar la foto
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            vehicleItem.photo = e.target.result; // Guardar la imagen en base64
-            addVehicleToList(vehicleItem); // Añadir el vehículo a la lista visual
-        };
-        reader.readAsDataURL(photo); // Leer la imagen como Data URL
+        // Añadir el vehículo a la lista visual
+        addVehicleToList(vehicleItem);
 
     } catch (error) {
         alert(error.message);
@@ -97,6 +67,7 @@ function addVehicleToList(vehicleItem) {
     const vehicleDiv = document.createElement('div');
     vehicleDiv.classList.add('vehicle-item');
 
+    // Creamos el contenido HTML para el vehículo
     vehicleDiv.innerHTML = `
         <h3>${vehicleItem.brand} ${vehicleItem.model} (${vehicleItem.registration_year})</h3>
         <p>Precio: $${vehicleItem.price}</p>
@@ -104,7 +75,7 @@ function addVehicleToList(vehicleItem) {
         <p>Tipo de Vehículo: ${vehicleItem.vehicleType}</p>
         <p>Combustible: ${vehicleItem.fuelType}</p>
         <p>Matrícula: ${vehicleItem.license_plate}</p>
-        <img src="${vehicleItem.photo}" alt="Foto del vehículo" style="width: 100px; margin: 5px;">
+        <img src="${URL.createObjectURL(vehicleItem.photo)}" alt="Foto del vehículo" style="width: 100px; margin: 5px;">
     `;
 
     vehicleList.appendChild(vehicleDiv);
@@ -123,35 +94,63 @@ document.getElementById('uploadVehiclesForm').addEventListener('submit', functio
         return;
     }
 
-    // Combinar la información de la flota con los vehículos
-    const fleetData = {
-        ...postInfo,
-        vehicles: vehicles
-    };
-
     // Construir la URL para la subida de vehículos
-    const url = '/api/vehicle/create';
+    const url = '/api/post/create';
 
-    // Enviar los datos al backend
+    // Enviar los datos al backend para crear el post
     fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(fleetData)
+        body: JSON.stringify(postInfo)
     })
     .then(response => {
         if (response.ok) {
-            alert('Vehículos subidos exitosamente.');
-            // Limpiar la lista de vehículos y la información de la flota
-            vehicles = [];
-            postInfo = {};
-            document.getElementById('vehicleList').innerHTML = '';
-            window.location.href = 'createFleet.html'; // Redirigir a la página de creación de flota
+            response.json().then(data => {
+                // Asegúrate de que el `post_id` es un número entero
+                const postId = data.post.post_id;
+    
+                if (!postId) {
+                    throw new Error("post_id no encontrado.");
+                }
+    
+                // Luego, para cada vehículo, enviar los datos con el `post_id` correcto
+                vehicles.forEach(vehicle => {
+                    const formData = new FormData();
+                    formData.append('license_plate', vehicle.license_plate);
+                    formData.append('brand', vehicle.brand);
+                    formData.append('model', vehicle.model);
+                    formData.append('registration_year', vehicle.registration_year);
+                    formData.append('price', vehicle.price);
+                    formData.append('observations', vehicle.observations);
+                    formData.append('vehicle_type', +vehicle.vehicleType);
+                    formData.append('fuel_type', vehicle.fuelType);
+                    formData.append('post_id', postId); // Aquí el `post_id` ya debería ser válido
+                    formData.append('photo', vehicle.photo); // Ahora enviamos el archivo, no el base64
+
+                    // Enviar los vehículos a la API
+                    fetch('/api/vehicle/create', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log("Vehículo subido exitosamente.");
+                        } else {
+                            console.error("Error al subir el vehículo.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error de red:", error);
+                    });
+                });
+            });
         } else {
-            throw new Error('Hubo un problema al subir los vehículos.');
+            throw new Error('Hubo un problema al crear el post.');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Hubo un problema al subir los vehículos.');
+        alert('Hubo un problema al crear el post.');
     });
 });
+
