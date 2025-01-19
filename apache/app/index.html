@@ -2,54 +2,39 @@
 <html lang="es">
 
 <head>
+    <title>Industrial Fleets</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css"> <!-- Asegúrate de que la ruta sea correcta -->
+    <link rel="stylesheet" href="css/index.css">
+    <script src="js/index.js"></script>
 </head>
 
 <body>
 
-    <h1>Compraventa de Industrial Fleets</h1>
+    <h1>Bienvenido a Industrial Fleets, tu lugar de compra de vehículos industriales</h1>
 
-    <!-- Información del usuario -->
-    <div id="userInfo">
-        <h2>Si ya tienes cuenta, accede con tu token, o regístrate si eres nuevo.</h2>
-        
-        <!-- Contenedor para el contenido dinámico de autenticación -->
-        <div id="contenido"></div>
+    <!-- Formulario de inicio de sesión -->
+    <section id="loginSection">
+        <form id="form">
+            <h1>Iniciar sesión</h1>
 
-        <!-- Mensaje para usuarios autenticados -->
-        <p id="user-message" style="display:none;">
-            ¡Hola, <span id="user-name"></span>! Estás conectado.
-        </p>
+            <div id="formCampos">
+                <input type="text" id="email" placeholder="Email" required><br>
+                <input type="password" id="password" placeholder="Contraseña" required><br>
+            </div>
 
-        <!-- Tabla de vehículos -->
-        <table id="postsTable">
-            <thead>
-                <tr>
-                    <th>Título</th>
-                    <th>Descripción</th>
-                    <th>Imagen</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Los posts se llenarán dinámicamente aquí -->
-            </tbody>
-        </table>
+            <button id="formButton" type="submit">Iniciar sesión</button>
+        </form>
+    </section>
 
-        <!-- Botones de acceso para usuarios no autenticados -->
-        <div id="auth-buttons">
-            <button id="loginBtn">Iniciar sesión</button>
-            <button id="registerBtn">Registrarse</button>
-        </div>
+    <div id="contenido"></div>
+
+    <!-- Botón redireccion registro -->
+    <h1>¿No tienes cuenta? Regístrate aquí</h1>
+    <div id="auth-buttons">
+        <button id="registerBtn">Registrarse</button>
     </div>
 
-    <!-- Modal de carga (Opcional) -->
-    <div id="loading" style="display:none;">
-        <p>Cargando...</p>
-    </div>
-
-    <script src="js/main.js"></script> <!-- Si necesitas un archivo JS, asegura su existencia y funcionalidad -->
 </body>
 
 </html>
