@@ -1,18 +1,15 @@
 // Obtener el formulario y agregar el evento de submit
-document.getElementById('registroForm').addEventListener('submit', function(event) {
+document.getElementById('form').addEventListener('submit', function(event) {
     event.preventDefault();  // Prevenir el comportamiento por defecto del formulario
 
     // Recoger los datos del formulario
     const email = document.getElementById('email').value;
     const name = document.getElementById('name').value;
-    const surname = document.getElementById('surname').value;
+    const last_name = document.getElementById('surname').value;
     const password = document.getElementById('password').value;
 
-    // Creamos el objeto de parámetros
-    const params = { email, name, surname, password };
-
     // Construimos la URL con los parámetros codificados
-    const url = `/api/register?${new URLSearchParams(params).toString()}`;
+    const url = `/api/users/register`;
 
     // Enviar los datos al backend
     fetch(url, {
@@ -21,18 +18,15 @@ document.getElementById('registroForm').addEventListener('submit', function(even
         body: JSON.stringify({
             email: email,
             name: name,
-            surname: surname,
+            last_name: last_name,
             password: password
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.token) {
-            // Guardar el token de sesión en localStorage
-            localStorage.setItem('token', data.token);
+    .then(response => {
+        if (response.ok) {
             window.location.href = '/';  // Redirigir a la página principal
-        } else {
-            alert('Error al registrarse');
+        }else{
+            alert('Hubo un problema al registrarse');
         }
     })
     .catch(error => {

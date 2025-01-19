@@ -1,15 +1,41 @@
 // Verificar si el usuario está autenticado
 function verificarSesion() {
-    const token = localStorage.getItem('token'); // O sessionStorage.getItem('token')
+    const token = getCookie('access_token'); // Obtener el token de la cookie
     const authButtons = document.getElementById('auth-buttons');  // Cambié el ID a 'auth-buttons' según el HTML.
 
-    // Si hay un token, significa que el usuario está autenticado
-    if (token) {
-        mostrarPosts(authButtons);  // Mostrar los posts si está autenticado
-    } else {
-        mostrarBotonesLoginRegistro(authButtons); // Mostrar los botones de login y registro
+    if (token === null) {
+        mostrarBotonesLoginRegistro(authButtons)
+        console.log("No cookies")
+    }
+    else {
+        console.log("Verifying cookie")
+        fetch('/api/secure-endpoint', {
+            method: 'GET'
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Si la respuesta es OK (status 200), el token es válido
+                    mostrarPosts(authButtons);  // Mostrar los posts si está autenticado
+                    console.log("Cookie verified")
+                } else {
+                    // Si la respuesta no es OK (por ejemplo, token inválido o expirado), mostrar los botones de login
+                    mostrarBotonesLoginRegistro(authButtons);
+                    console.log("Cookie not verified")
+                }
+            })
+            .catch(error => {
+                console.error('Error al verificar la sesión:', error);
+                mostrarBotonesLoginRegistro(authButtons);  // Si hay un error, mostrar los botones de login y registro
+            });
     }
 }
+
+// Obtener el valor de una cookie por su nombre
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+  }
 
 // Mostrar los posts para usuarios autenticados
 function mostrarPosts(authButtons) {
@@ -31,7 +57,6 @@ function mostrarPosts(authButtons) {
 function mostrarBotonesLoginRegistro(authButtons) {
     const contenido = document.getElementById('contenido');
     contenido.innerHTML = `
-        <h1>Bienvenido a la compraventa de vehículos industriales</h1>
         <p>Para acceder a todas las funciones, por favor inicia sesión o regístrate.</p>
     `;
 
@@ -52,10 +77,25 @@ function irRegistro() {
     window.location.href = '/img/register.html';  // Asegúrate de que la ruta sea la correcta
 }
 
-// Cerrar sesión (eliminar el token)
+// Cerrar sesión (eliminar la cookie del token)
 function cerrarSesion() {
-    localStorage.removeItem('token');  // Elimina el token de localStorage
-    window.location.href = '/';  // Redirige al inicio
+    fetch('/api/logout', {
+        method: 'POST'
+    })
+        .then(response => {
+            if (response.ok) {
+                // Si la respuesta es OK (status 200), el token es válido
+                console.log("Session Closed")
+                window.location.href = '/';  // Asegúrate de que la ruta sea la correcta
+            } else {
+                console.log("Session not closed")
+                window.location.href = '/';  // Asegúrate de que la ruta sea la correcta
+            }
+        })
+        .catch(error => {
+            console.error('Error al verificar la sesión:', error);
+            mostrarBotonesLoginRegistro(authButtons);  // Si hay un error, mostrar los botones de login y registro
+        });
 }
 
 // Llamar a la función al cargar la página
@@ -69,11 +109,11 @@ const apiUrl = "/api/post/getlast"; // Reemplaza esta URL con la de tu API real
 // Función para cargar los posts
 async function loadPosts() {
     try {
-        // Obtener el token almacenado en localStorage
-        const token = localStorage.getItem('token');
+        // Obtener el token de las cookies
+        const token = getCookie('access_token');
 
         // Si no hay token, no hacemos la solicitud
-        if (!token) {
+        if (token === null) {
             alert("No estás autenticado. Por favor, inicia sesión.");
             return;
         }
@@ -88,7 +128,6 @@ async function loadPosts() {
         const response = await fetch(url, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}`,  // Agregar el token como un encabezado Bearer
                 'Content-Type': 'application/json'   // Tipo de contenido JSON
             }
         });
@@ -153,4 +192,3 @@ async function loadPosts() {
         alert('Hubo un error al cargar los posts');
     }
 }
-
