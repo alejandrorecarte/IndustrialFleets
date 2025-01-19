@@ -3,6 +3,9 @@ from controllers.queries import create_vehicle_query, check_vehicle_access_query
 from database import execute, execute_query
 from controllers.post import check_post_access
 from fastapi import HTTPException, status
+import logging
+
+logger = logging.getLogger(__name__)
 
 def check_vehicle_access(user_email: str, license_plate: str, db_connection):
     query = check_vehicle_access_query()
@@ -23,6 +26,8 @@ def check_vehicle_access(user_email: str, license_plate: str, db_connection):
     )
 
 def vehicle_formatter(vehicle_nf):
+
+    logger.debug(vehicle_nf)
     
     vehicle = Vehicle(
         license_plate=vehicle_nf[0],
@@ -31,8 +36,8 @@ def vehicle_formatter(vehicle_nf):
         registration_year=vehicle_nf[3],
         price = vehicle_nf[4],
         observations=vehicle_nf[5],
-        vehicle_type=VehicleType(vehicle_nf[6].split(".")[1].upper()),
-        fuel_type=FuelType(vehicle_nf[7].split(".")[1].upper()),
+        vehicle_type=VehicleType(vehicle_nf[6]),
+        fuel_type=FuelType(vehicle_nf[7]),
         photo=vehicle_nf[8],
         post_id=vehicle_nf[9]
     )

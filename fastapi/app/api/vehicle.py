@@ -1,15 +1,15 @@
-from fastapi import APIRouter, HTTPException, status, Depends, UploadFile, File, Request
+from fastapi import APIRouter, HTTPException, status, Depends, UploadFile, File, Form, Request
 from pydantic import BaseModel
 from models.vehicle import Vehicle, VehicleType, FuelType
 from database import get_db_connection
 import logging
 from controllers.vehicle import create_vehicle, update_vehicle, delete_vehicle, get_vehicle, get_post_vehicles
 from utils import get_token_from_cookie
-import base64
+from fastapi.responses import JSONResponse
 import os
+import base64
 
 MAX_IMAGE_SIZE = int(os.getenv("MAX_IMAGE_SIZE", 5)) * 1024 * 1024
-logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -36,14 +36,6 @@ class CreateVehicleRequest(BaseModel):
     fuel_type: FuelType
     post_id: int
     photo: UploadFile = File(...)
-
-from fastapi import APIRouter, HTTPException, File, UploadFile, Form, Depends, status
-from database import get_db_connection
-from utils import get_token_from_cookie
-import base64
-import logging
-from models.vehicle import Vehicle, VehicleType, FuelType
-from controllers.vehicle import create_vehicle
 
 router = APIRouter()
 
@@ -173,9 +165,6 @@ def post_delete_vehicle(body: DeleteVehicleRequest, request: Request, token: str
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=str(error)
                 )
-        
-import base64
-from fastapi.responses import JSONResponse
 
 @router.get("/get", status_code=status.HTTP_200_OK)
 def get_vehicle_by_license_plate(license_plate: str, request: Request, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):

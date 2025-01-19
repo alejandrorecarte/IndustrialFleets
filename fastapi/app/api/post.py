@@ -72,9 +72,8 @@ def post_delete_post(body: DeletePostRequest, request: Request, token: str = Dep
  
 @router.get("/get", status_code=status.HTTP_200_OK)
 def get_post_by_id(post_id: int, request: Request, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
-    user_email = token["user_email"]
     try:
-        post = get_post(post_id, user_email, db_connection=db_connection)
+        post = get_post(post_id, db_connection=db_connection)
         return {"post": post}
     except Exception as error:
         logger.warning(str(error))

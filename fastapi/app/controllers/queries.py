@@ -53,4 +53,4 @@ def get_vehicle_query():
     return ("SELECT * FROM Vehicles WHERE license_plate LIKE %s")
 
 def get_post_vehicles_query():
-    return ("SELECT v.license_plate, v.registration_year, v.observations, v.vehicle_type, v.fuel_type, v.photo, v.post_id FROM Vehicles v INNER JOIN Posts p ON v.post_id = p.post_id WHERE v.post_id LIKE %s")
+    return ("SELECT v.license_plate, v.brand, v.model, v.registration_year, v.price, v.observations, v.vehicle_type, v.fuel_type, v.photo, v.post_id FROM Vehicles v INNER JOIN Posts p ON v.post_id = p.post_id WHERE v.post_id LIKE %s")
