@@ -3,7 +3,7 @@ let vehicles = [];
 let postInfo = {}; // Asegúrate de que postInfo contenga la información necesaria
 
 // Obtener el formulario y agregar el evento de submit para la creación de la flota
-document.getElementById('fleetForm').addEventListener('submit', function(event) {
+document.getElementById('postForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
 
     // Recoger los datos del formulario
@@ -122,7 +122,7 @@ document.getElementById('uploadVehiclesForm').addEventListener('submit', functio
                     formData.append('registration_year', vehicle.registration_year);
                     formData.append('price', vehicle.price);
                     formData.append('observations', vehicle.observations);
-                    formData.append('vehicle_type', +vehicle.vehicleType);
+                    formData.append('vehicle_type', vehicle.vehicleType);
                     formData.append('fuel_type', vehicle.fuelType);
                     formData.append('post_id', postId); // Aquí el `post_id` ya debería ser válido
                     formData.append('photo', vehicle.photo); // Ahora enviamos el archivo, no el base64
