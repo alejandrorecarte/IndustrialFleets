@@ -1,24 +1,23 @@
 from enum import Enum
 from pydantic import BaseModel
 from typing import Optional
-from io import BytesIO
-import os
+import base64
 
 class FuelType(Enum):
-    GASOLINE = "Gasolina"
-    DIESEL = "Diésel"
-    ELECTRIC = "Eléctrico"
-    HYBRID = "Híbrido"
+    GASOLINE = "GASOLINE"
+    DIESEL = "DIESEL"
+    ELECTRIC = "ELECTRIC"
+    HYBRID = "HYBRID"
 
 class VehicleType(Enum):
-    CAR = "Coche"
-    TRUCK = "Camión"
-    MOTORCYCLE = "Motocicleta"
-    BUS = "Bus"
-    FORK_LIFT = "Carretilla elevadora"
-    CRANE_TRUCK = "Camión con grúa"
-    CEMENT_TRUCK = "Camión de cemento"
-    TBM = "Tuneladora"
+    CAR = "CAR"
+    TRUCK = "TRUCK"
+    MOTORCYCLE = "MOTORCYCLE"
+    BUS = "BUS"
+    FORK_LIFT = "FORK_LIFT"
+    CRANE_TRUCK = "CRANE_TRUCK"
+    CEMENT_TRUCK = "CEMENT_TRUCK"
+    TBM = "TBM"
 
 # Modelo de vehículo con Pydantic
 class Vehicle(BaseModel):
@@ -33,3 +32,6 @@ class Vehicle(BaseModel):
     photo: Optional[bytes]
     post_id: int
 
+    class Config:
+        # Esto asegura que los valores del Enum sean convertidos a cadenas en las respuestas JSON
+        use_enum_values = True

@@ -1,6 +1,6 @@
 #USER
-def create_user_query():
-    return "INSERT INTO Users (email, name, surname, hashed_password) VALUES (%s, %s, %s, %s);"
+def register_query():
+    return "INSERT INTO Users (email, name, last_name, hashed_password) VALUES (%s, %s, %s, %s);"
 
 def login_query():
     return "SELECT * FROM Users WHERE email LIKE %s;"

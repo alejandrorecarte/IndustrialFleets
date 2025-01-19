@@ -8,25 +8,25 @@
 </head>
 <body>
 
-    <h1>Agregar Vehículos</h1>
+    <h1>Agregar Flota</h1>
 
     <!-- Formulario para título y descripción de la flota -->
-    <div id="fleetInfo">
-        <h2>Información de la flota</h2>
-        <input type="text" id="fleetTitle" placeholder="Título de la flota" required><br>
-        <textarea id="fleetDescription" placeholder="Descripción de la flota" required></textarea><br>
-        <button type="button" id="startAddingVehiclesBtn">Iniciar Agregar Vehículos</button>
-    </div>
+    <form id="fleetForm">
+        <input type="text" id="title" placeholder="Título de la flota" required><br>
+        <textarea id="description" placeholder="Descripción de la flota" required></textarea><br>
+        <button type="submit">Crear Flota</button>
+    </form>
 
     <!-- Formulario para agregar vehículos -->
     <div id="vehicleFormSection" style="display: none;">
+        <h2>Agregar Vehículo</h2>
         <form id="vehicleForm">
             <input type="text" id="license_plate" placeholder="Matrícula" required><br>
-            <input type="text" id="make" placeholder="Marca y modelo" required><br>
+            <input type="text" id="brand" placeholder="Marca" required><br>
             <input type="text" id="model" placeholder="Modelo" required><br>
-            <input type="number" id="year" placeholder="Año" required><br>
-            <input type="number" id="price" placeholder="Precio" required><br>
-            <textarea id="description" placeholder="Descripción" required></textarea><br>
+            <input type="number" id="registration_year" placeholder="Año de Registro" required min="1900" max="2100"><br>
+            <input type="number" id="price" placeholder="Precio" required step="0.01"><br>
+            <textarea id="observations" placeholder="Observaciones" maxlength="1000"></textarea><br>
             
             <!-- Desplegables de tipo de vehículo y combustible -->
             <select id="vehicleType" required>
@@ -42,14 +42,17 @@
             </select><br>
 
             <!-- Permitir solo imágenes -->
-            <input type="file" id="photos" multiple required accept="image/*"><br>
+            <input type="file" id="photo" required accept="image/*"><br>
             <button type="button" id="addVehicleBtn">Añadir Vehículo</button>
         </form>
     </div>
 
     <div id="vehicleList"></div>
 
-    <button type="button" id="uploadVehiclesBtn" style="display: none;">Subir Vehículos</button>
+    <!-- Formulario para subir vehículos -->
+    <form id="uploadVehiclesForm" style="display: none;">
+        <button type="submit" id="uploadVehiclesBtn">Subir Vehículos</button>
+    </form>
 
     <script src="../js/createPost.js"></script> 
 </body>

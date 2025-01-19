@@ -1,7 +1,7 @@
 CREATE TABLE Users (
   email varchar(255) PRIMARY KEY,
   name varchar(25) NOT NULL,
-  surname varchar(50) NOT NULL,
+  last_name varchar(50) NOT NULL,
   hashed_password TEXT NOT NULL
 );
 
@@ -24,7 +24,7 @@ CREATE TABLE Vehicles (
   observations varchar(1000),
   vehicle_type varchar(25) NOT NULL,
   fuel_type varchar(25) NOT NULL,
-  photo BLOB,
+  photo LONGBLOB,
   post_id INT,
   FOREIGN KEY (post_id) REFERENCES Posts(post_id)
 );
