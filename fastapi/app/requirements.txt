@@ -8,3 +8,4 @@ bcrypt
 pyjwt
 starlette
 python-multipart
+pydantic
