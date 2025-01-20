@@ -107,11 +107,8 @@ nav h1 {
     justify-content: center;
     padding: 20px;
     width: 100%;
-    /* Asegurar que ocupe todo el ancho disponible */
     max-width: 1200px;
-    /* Ajustar el ancho máximo según tus necesidades */
     margin: 0 auto;
-    /* Centrar la sección */
 }
 
 .card {
@@ -120,9 +117,42 @@ nav h1 {
     padding: 20px;
     margin: 10px;
     flex: 1 1 calc(33.333% - 40px);
-    /* Ajustar el ancho según tus necesidades */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Estilos para los controles de paginación */
+#paginationControls {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.pagination-button {
+    background-color: #ff7e5f;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #fff;
+    cursor: pointer;
+    margin: 0 5px;
+    transition: background-color 0.3s ease;
+}
+
+.pagination-button:disabled {
+    background-color: #feb47b;
+    cursor: default;
+}
+
+.pagination-button:hover:not(:disabled) {
+    background-color: #feb47b;
 }
 
 /* Responsive Design */

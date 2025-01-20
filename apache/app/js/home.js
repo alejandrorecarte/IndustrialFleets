@@ -1,5 +1,13 @@
 window.onload = function () {
     verificarSesion();
+    const cardsSection = document.getElementById('cardsSection');
+    const params = new URLSearchParams(window.location.search);
+    let page = parseInt(params.get('page')); 
+    if (page === null || isNaN(page) || page < 1) {
+        page = 1;
+    }
+    // Cargar las tarjetas al cargar la página
+    loadCards(cardsSection, page);
 }
 
 // Obtener el valor de una cookie por su nombre
@@ -39,12 +47,14 @@ function verificarSesion() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    console.log("Adding event listeners")
+
     document.getElementById("addPostButton").addEventListener("click", function (event) {
         event.preventDefault();
         window.location.href = '/img/createPost.html';  // Asegúrate de que la ruta sea la correcta
     });
 
-    document.getElementById("logoutButton").addEventListener("click", function (event) {
+    document.getElementById("logoutButton").addEventListener("click", function () {
         fetch('/api/users/logout', {
             method: 'POST'
         })
@@ -64,3 +74,63 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     })
 });
+
+
+// Función para crear una tarjeta
+function createCard(title, description, postId) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.addEventListener('click', () => {
+        window.location.href = `post.html?post_id=${postId}`; // Redirigir a post.html con el id del post
+    });
+
+    const cardTitle = document.createElement('h2');
+    cardTitle.textContent = title;
+
+    const cardDescription = document.createElement('p');
+    cardDescription.textContent = description;
+
+    card.appendChild(cardTitle);
+    card.appendChild(cardDescription);
+
+    return card;
+}
+
+
+function loadCards(cardsSection, page = 0) {
+    console.log("Cargando tarjetas de la página:", page);
+    const url = `/api/post/last?page=${page}`; // Construir la URL con el parámetro page
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Llamada la API exitosa.")
+            cardsSection.innerHTML = '';
+            data.last_posts.forEach(item => {
+                console.log("Creando tarjeta para:", item.title);
+                const card = createCard(item.title, item.description, item.post_id);
+                cardsSection.appendChild(card);
+            });
+            generatePaginationControls(data.page, data.max_pages);
+        })
+        .catch(error => console.error('Error al cargar las tarjetas:', error));
+}
+
+   // Función para generar los controles de paginación
+   function generatePaginationControls(currentPage, maxPages) {
+    console.log("Generando controles de paginación..." + currentPage + " " + maxPages);
+    const paginationControls = document.getElementById('paginationControls');
+    paginationControls.innerHTML = '';
+
+    for (let i = 1; i <= maxPages; i++) {
+        const button = document.createElement('button');
+        button.textContent = i;
+        button.className = 'pagination-button';
+        if (i === currentPage) {
+            button.disabled = true;
+        }
+        button.addEventListener('click', function() { 
+            window.location.href = `/img/home.html?page=${i}`;
+        });
+        paginationControls.appendChild(button); // Asegúrate de agregar el botón al contenedor
+    }
+}

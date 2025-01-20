@@ -174,15 +174,23 @@ document.getElementById('uploadVehiclesForm').addEventListener('submit', functio
                     })
                     .then(response => {
                         if (response.ok) {
-                            console.log("Vehículo subido exitosamente.");
+                            alert("Vehículo subido correctamente")
+                            console.log("Vehicle uploaded successfully");
                         } else {
-                            console.error("Error al subir el vehículo.");
+                            alert("Hubo un problema al subir el vehículo.");
+                            console.error("Error uploading vehicle.");
+                            throw new Error('Hubo un problema al crear el post.');
                         }
                     })
                     .catch(error => {
+                        alert("Hubo un problema de red.");
                         console.error("Error de red:", error);
                     });
                 });
+                
+                alert("Post creado correctamente");
+                // Redirigir al usuario a la página de inicio
+                window.location.href = '/img/home.html';
             });
         } else {
             throw new Error('Hubo un problema al crear el post.');
@@ -193,4 +201,3 @@ document.getElementById('uploadVehiclesForm').addEventListener('submit', functio
         alert('Hubo un problema al crear el post.');
     });
 });
-
