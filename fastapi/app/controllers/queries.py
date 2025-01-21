@@ -36,6 +36,9 @@ def get_post_last_pages_query():
 def get_last_id():
     return "SELECT LAST_INSERT_ID()"
 
+def get_total_price_query():
+    return "SELECT SUM(v.price) FROM Vehicles v INNER JOIN Posts p ON v.post_id = p.post_id WHERE p.post_id LIKE %s"
+
 #VEHICLE
 def check_vehicle_access_query():
     return "SELECT p.user_email FROM Vehicles v INNER JOIN Posts p ON v.post_id = p.post_id WHERE v.license_plate LIKE %s"

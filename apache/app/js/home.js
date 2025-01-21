@@ -1,8 +1,10 @@
+let page = 1;
+
 window.onload = function () {
     verificarSesion();
     const cardsSection = document.getElementById('cardsSection');
     const params = new URLSearchParams(window.location.search);
-    let page = parseInt(params.get('page')); 
+    page = parseInt(params.get('page')); 
     if (page === null || isNaN(page) || page < 1) {
         page = 1;
     }
@@ -37,7 +39,7 @@ function verificarSesion() {
                 } else {
                     // Si la respuesta no es OK (por ejemplo, token inválido o expirado), mostrar los botones de login
                     console.log("Cookie not verified")
-                    window.location.href = '../index.html';
+                    window.location.href = '../index.html?back_url=/img/home.html?page=' + page;
                 }
             })
             .catch(error => {
@@ -62,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (response.ok) {
                     // Si la respuesta es OK (status 200), el token es válido
                     console.log("Session Closed")
-                    window.location.href = '../index.html';  // Asegúrate de que la ruta sea la correcta
+                    window.location.href = '../index.html?back_url=/img/home.html?page=' + page;
                 } else {
                     console.log("Session not closed")
                     alert("No se pudo cerrar la sesión")
@@ -98,6 +100,7 @@ function createCard(title, description, postId) {
 
 
 function loadCards(cardsSection, page = 0) {
+    page--
     console.log("Cargando tarjetas de la página:", page);
     const url = `/api/post/last?page=${page}`; // Construir la URL con el parámetro page
     fetch(url)
@@ -117,6 +120,7 @@ function loadCards(cardsSection, page = 0) {
 
    // Función para generar los controles de paginación
    function generatePaginationControls(currentPage, maxPages) {
+    currentPage++
     console.log("Generando controles de paginación..." + currentPage + " " + maxPages);
     const paginationControls = document.getElementById('paginationControls');
     paginationControls.innerHTML = '';

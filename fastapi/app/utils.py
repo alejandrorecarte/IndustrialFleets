@@ -55,3 +55,6 @@ def create_token(email: str):
             "exp": expiration_time
         }
         return jwt.encode(payload, os.getenv("SECRET_KEY"), algorithm="HS256")
+    
+def calc_iva(price: float) -> float:
+    return price * 0.21

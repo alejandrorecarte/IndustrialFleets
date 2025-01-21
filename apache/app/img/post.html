@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 
+<header>
+    <nav>
+        <img id= "homePageLogo" src="../favicon.ico" alt="Logo" style="width: 100px; height: 100px;">
+        <h1 id = "homePageTitle">Industrial Fleets</h1>
+        <button id="backButton">Volver</button>
+    </nav>
+</header>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,11 +19,17 @@
 
 <body>
 
-    <h1>PostName</h1>
+    <h1 id="postTitle">PostName</h1>
     <form id="postForm">
-        <input type="text" id="postTitle" required readonly>
+        <label for="postDescription">Descripción</label>
         <textarea id="postDescription" required readonly></textarea>
-
+        <label for="postCreatedAt">Creado el día</label>
+        <input id="postCreatedAt" type="datetime-local" required readonly>
+        <label for="postUpdatedAt">Precio total (sin impuestos)</label>
+        <input id="postTotalPrice" required readonly>
+        <label for="postIva">IVA</label>
+        <input id="postIva" required readonly>
+        <label for="vehicleList">Vehículos</label>
     <div id="vehicleList"></div>
 
 </body>

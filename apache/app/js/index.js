@@ -1,6 +1,12 @@
+let backUrl = null;
+
 // Llamar a la función al cargar la página
 window.onload = function () {
     verificarSesion();
+
+    const params = new URLSearchParams(window.location.search);
+    backUrl = params.get('back_url');
+    console.log("Volver después a ", backUrl);
 }
 
 // Obtener el valor de una cookie por su nombre
@@ -66,7 +72,12 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(response => {
                 if (response.ok) {
-                    window.location.href = '/img/home.html';
+                    if(backUrl === null){
+                        window.location.href = '/img/home.html';
+                    }
+                    else{
+                        window.location.href= backUrl
+                    }
                 } else {
                     alert('Hubo un problema al iniciar sesión');
                 }
