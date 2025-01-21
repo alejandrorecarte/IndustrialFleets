@@ -14,8 +14,8 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - docker_mariadb_data:/var/lib/mysql  # Volumen para persistir datos de MariaDB
-      - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql  # Si deseas inicializar la base de datos con un archivo SQL
+      - docker_mariadb_data:/var/lib/mysql
+      - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
@@ -28,7 +28,7 @@ services:
       - "8001:80"
     depends_on:
       - db
-    
+
   fastapi:
     build:
       context: .
@@ -44,8 +44,14 @@ services:
       DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
       DB_NAME: ${MYSQL_DATABASE}
+      PYTHONBUFFERED: 1
+      CONNECTION_TRIES: ${CONNECTION_TRIES}
+      EXPIRATION_MINUTES: ${EXPIRATION_MINUTES}
+      SECRET_KEY: ${SECRET_KEY}
+      PAGE_SIZE: ${PAGE_SIZE}
+      MAX_IMAGE_SIZE: ${MAX_IMAGE_SIZE}
     volumes:
-      - ./fastapi/app:/fastapi/app  # Volumen compartido para FastAPI (para persistencia de archivos y datos)
+      - ./fastapi/app:/fastapi/app
 
   apache:
     build:
@@ -53,7 +59,7 @@ services:
       dockerfile: apache/Dockerfile
     container_name: apache
     ports:
-      - "8080:80"
+      - "7777:80"
     volumes:
       - ./apache/app:/usr/local/apache2/htdocs/
     depends_on:
@@ -61,5 +67,5 @@ services:
       - fastapi
 
 volumes:
-  docker_mariadb_data:  # Volumen para la persistencia de datos de MariaDB
+  docker_mariadb_data:
     driver: local

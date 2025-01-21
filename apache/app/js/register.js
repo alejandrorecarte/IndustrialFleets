@@ -34,3 +34,10 @@ document.getElementById('form').addEventListener('submit', function(event) {
         alert('Hubo un problema al registrarse');
     });
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById("backButton").addEventListener("click", function (event) {
+        event.preventDefault();
+        window.location.href = "../index.html";
+    })
+});

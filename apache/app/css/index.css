@@ -10,8 +10,6 @@ body {
     font-family: 'Roboto', sans-serif;
     background: linear-gradient(135deg, #ff7e5f, #feb47b);
     color: #fff;
-    padding: 0;
-    margin: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -19,72 +17,78 @@ body {
     min-height: 100vh;
 }
 
-/* Title */
-h1 {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 20px;
-    color: #fff;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+/* Header */
+header {
+    width: 100%;
+    padding: 20px;
     text-align: center;
-    letter-spacing: 1px;
 }
 
-/* Section for User Info */
-#userInfo {
+nav {
     background-color: rgba(0, 0, 0, 0.6);
     padding: 30px;
     border-radius: 10px;
     width: 100%;
-    max-width: 800px;
+    max-width: 600px;
+    /* Aumentar el max-width para más espacio */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    margin-bottom: 40px;
     text-align: center;
+    margin: 0 auto;
+    /* Centrar el nav */
 }
 
-/* Header for User Info */
-#userInfo h2 {
-    font-size: 2rem;
+nav h1 {
+    font-size: 2.5rem;
     margin-bottom: 20px;
     color: #feb47b;
 }
 
-/* Table for Posts (Vehicles) */
-#postsTable {
+/* Main Section for Login Form */
+#loginSection {
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 30px;
+    border-radius: 10px;
     width: 100%;
-    max-width: 800px;
-    margin-top: 20px;
-    border-collapse: collapse;
+    max-width: 400px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    text-align: center;
 }
 
-#postsTable th, #postsTable td {
-    padding: 12px;
-    text-align: left;
-}
-
-#postsTable th {
-    background-color: rgba(0, 0, 0, 0.7);
+/* Title */
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
     color: #feb47b;
 }
 
-#postsTable td {
-    background-color: rgba(0, 0, 0, 0.5);
+/* Form Fields */
+#formCampos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 2px solid #feb47b;
+    border-radius: 5px;
+    background-color: #333;
     color: #fff;
+    font-size: 1rem;
 }
 
-#postsTable img {
-    max-width: 150px;
-    width: auto;
-    margin: 5px;
-    border-radius: 10px;
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: #ff7e5f;
 }
 
-/* Buttons for Login and Register */
-#auth-buttons {
-    margin-top: 20px;
-}
-
-#auth-buttons button {
+/* Submit Button */
+#formButton,
+#registerButton {
     background-color: #ff7e5f;
     border: none;
     padding: 12px 20px;
@@ -93,27 +97,18 @@ h1 {
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    width: 45%;
-    margin: 10px;
+    width: 100%;
+    margin-top: 20px;
 }
 
-#auth-buttons button:hover {
+#formButton:hover,
+#registerButton:hover {
     background-color: #feb47b;
 }
 
-/* Loading Modal */
-#loading {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: #fff;
-    font-size: 1.5rem;
+/* Footer */
+footer {
+    margin-top: 20px;
 }
 
 /* Responsive Design */
@@ -123,20 +118,11 @@ h1 {
     }
 
     h1 {
-        font-size: 2.5rem;
+        font-size: 2rem;
     }
 
-    #userInfo {
+    #loginSection {
         padding: 20px;
         width: 100%;
-    }
-
-    #postsTable {
-        max-width: 100%;
-    }
-
-    #auth-buttons button {
-        width: 100%;
-        margin: 10px 0;
     }
 }

@@ -1,55 +1,43 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css"> <!-- Asegúrate de que la ruta sea correcta -->
+    <title>Iniciar sesión</title>
+    <link rel="stylesheet" href="../css/index.css"> <!-- Aquí se usa el mismo archivo CSS -->
+    <script src="/js/index.js"></script> <!-- Este es el archivo JS de login -->
+
 </head>
 
 <body>
 
-    <h1>Compraventa de Industrial Fleets</h1>
+    <!-- Header -->
+    <header>
+        <nav>
+            <img src="favicon.ico" alt="Logo" style="width: 100px; height: 100px;">
+            <h1>Industrial Fleets</h1>
+        </nav>
+    </header>
 
-    <!-- Información del usuario -->
-    <div id="userInfo">
-        <h2>Si ya tienes cuenta, accede con tu token, o regístrate si eres nuevo.</h2>
-        
-        <!-- Contenedor para el contenido dinámico de autenticación -->
-        <div id="contenido"></div>
+    <!-- Main Section for Login Form -->
+    <section id="loginSection">
+        <form id="form">
+            <h1>Iniciar sesión</h1>
+            
+            <!-- Form Fields for Email and Password -->
+            <div id="formCampos">
+                <input type="text" id="email" placeholder="Email" required><br>
+                <input type="password" id="password" placeholder="Contraseña" required><br>
+            </div>
+            
+            <!-- Submit Button -->
+            <button id="formButton" type="submit">Iniciar sesión</button>
+            <button id="registerButton" type="button">Registrarse</button>
+        </form>
+    </section>
 
-        <!-- Mensaje para usuarios autenticados -->
-        <p id="user-message" style="display:none;">
-            ¡Hola, <span id="user-name"></span>! Estás conectado.
-        </p>
+    <!-- Footer -->
+    <footer></footer>
 
-        <!-- Tabla de vehículos -->
-        <table id="postsTable">
-            <thead>
-                <tr>
-                    <th>Título</th>
-                    <th>Descripción</th>
-                    <th>Imagen</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Los posts se llenarán dinámicamente aquí -->
-            </tbody>
-        </table>
-
-        <!-- Botones de acceso para usuarios no autenticados -->
-        <div id="auth-buttons">
-            <button id="loginBtn">Iniciar sesión</button>
-            <button id="registerBtn">Registrarse</button>
-        </div>
-    </div>
-
-    <!-- Modal de carga (Opcional) -->
-    <div id="loading" style="display:none;">
-        <p>Cargando...</p>
-    </div>
-
-    <script src="js/main.js"></script> <!-- Si necesitas un archivo JS, asegura su existencia y funcionalidad -->
 </body>
-
 </html>

@@ -1,3 +1,43 @@
+window.onload = function () {
+    verificarSesion();
+}
+
+// Obtener el valor de una cookie por su nombre
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
+// Verificar si el usuario está autenticado
+function verificarSesion() {
+    const token = getCookie('access_token'); // Obtener el token de la cookie
+
+    if (token === null) {
+        window.location.href = '../index.html';
+        console.log("No cookies")
+    }
+    else {
+        console.log("Verifying cookie")
+        fetch('/api/secure-endpoint', {
+            method: 'GET'
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Si la respuesta es OK (status 200), el token es válido
+                    console.log("Cookie verified")
+                } else {
+                    // Si la respuesta no es OK (por ejemplo, token inválido o expirado), mostrar los botones de login
+                    console.log("Cookie not verified")
+                    window.location.href = '../index.html?back_url=/img/createPost.html';
+                }
+            })
+            .catch(error => {
+                console.error('Error al verificar la sesión:', error);
+            });
+    }
+}
+
 // Inicializa el array de vehículos y el objeto de información de la flota
 let vehicles = [];
 let postInfo = {}; // Asegúrate de que postInfo contenga la información necesaria
@@ -70,7 +110,7 @@ function addVehicleToList(vehicleItem) {
     // Creamos el contenido HTML para el vehículo
     vehicleDiv.innerHTML = `
         <h3>${vehicleItem.brand} ${vehicleItem.model} (${vehicleItem.registration_year})</h3>
-        <p>Precio: $${vehicleItem.price}</p>
+        <p>Precio: ${vehicleItem.price}€</p>
         <p>${vehicleItem.observations}</p>
         <p>Tipo de Vehículo: ${vehicleItem.vehicleType}</p>
         <p>Combustible: ${vehicleItem.fuelType}</p>
@@ -134,15 +174,23 @@ document.getElementById('uploadVehiclesForm').addEventListener('submit', functio
                     })
                     .then(response => {
                         if (response.ok) {
-                            console.log("Vehículo subido exitosamente.");
+                            alert("Vehículo subido correctamente")
+                            console.log("Vehicle uploaded successfully");
                         } else {
-                            console.error("Error al subir el vehículo.");
+                            alert("Hubo un problema al subir el vehículo.");
+                            console.error("Error uploading vehicle.");
+                            throw new Error('Hubo un problema al crear el post.');
                         }
                     })
                     .catch(error => {
+                        alert("Hubo un problema de red.");
                         console.error("Error de red:", error);
                     });
                 });
+                
+                alert("Post creado correctamente");
+                // Redirigir al usuario a la página de inicio
+                window.location.href = '/img/home.html';
             });
         } else {
             throw new Error('Hubo un problema al crear el post.');
@@ -154,3 +202,15 @@ document.getElementById('uploadVehiclesForm').addEventListener('submit', functio
     });
 });
 
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById("backButton").addEventListener("click", function (event) {
+        document.location.href = '/img/home.html';
+    })
+    document.getElementById("homePageLogo").addEventListener("click", function (event) {
+        document.location.href = '/img/home.html';
+    })
+    document.getElementById("homePageTitle").addEventListener("click", function (event) {
+        document.location.href = '/img/home.html';
+    })
+})

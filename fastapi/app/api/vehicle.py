@@ -13,35 +13,11 @@ MAX_IMAGE_SIZE = int(os.getenv("MAX_IMAGE_SIZE", 5)) * 1024 * 1024
 
 router = APIRouter()
 
-def vehicle_getter(vehicle: Vehicle):
-    vehicle_data = vehicle.model_dump()
-    
-    # Si el vehículo tiene una imagen, convertirla a base64
-    if vehicle_data.get("photo"):
-        # Decodificar la imagen de base64 (si la base de datos almacena la imagen como base64)
-        photo_base64 = base64.b64encode(vehicle.photo).decode('utf-8')
-        vehicle_data['photo'] = photo_base64  # Añadir la imagen codificada en base64 a la respuesta
-    
-    return vehicle_data
-
-
-class CreateVehicleRequest(BaseModel):
-    license_plate: str
-    brand: str
-    model: str
-    registration_year: int
-    price: float
-    observations: str
-    vehicle_type: VehicleType
-    fuel_type: FuelType
-    post_id: int
-    photo: UploadFile = File(...)
-
-router = APIRouter()
-
 logger = logging.getLogger(__name__)
 
-MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5 MB, por ejemplo
+def vehicle_getter(vehicle: Vehicle):
+    vehicle_data = vehicle.model_dump()
+    return vehicle_data
 
 class CreateVehicleRequest(BaseModel):
     license_plate: str

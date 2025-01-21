@@ -7,3 +7,5 @@ class Post(BaseModel):
     post_timestamp:int = None
     is_sold:bool = False
     user_email:str = None
+    total_price:float = None
+    iva:float = None
