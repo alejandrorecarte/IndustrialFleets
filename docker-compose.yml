@@ -52,6 +52,7 @@ services:
       MAX_IMAGE_SIZE: ${MAX_IMAGE_SIZE}
     volumes:
       - ./fastapi/app:/fastapi/app
+      - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   apache:
     build:
