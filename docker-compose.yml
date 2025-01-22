@@ -34,8 +34,6 @@ services:
       context: .
       dockerfile: fastapi/Dockerfile
     container_name: fastapi
-    ports:
-      - "8000:8000"
     depends_on:
       - db
     environment:
