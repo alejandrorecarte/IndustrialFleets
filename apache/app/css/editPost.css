@@ -164,7 +164,7 @@ h1 {
     border-color: #ff7e5f;
 }
 
-#addVehicleButton {
+#addVehicleButton, #editPostButton {
     background-color: #ff7e5f;
     border: none;
     padding: 12px 20px;
@@ -188,7 +188,7 @@ h1 {
     margin-top: 20px;
 }
 
-#addVehicleBtn:hover, #addPostBtn:hover {
+#addVehicleBtn:hover, #addPostBtn:hover, #editPostButton:hover, #addVehicleButton:hover {
     background-color: #feb47b;
 }
 
