@@ -119,6 +119,31 @@ function openVehicleWindow(license_plate) {
     ;
 }
 
+function deleteVehicle(license_plate) {
+    const body = {"license_plate": license_plate}
+
+    const url = '/api/vehicle/delete';
+    try{
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        }).then(response => {
+            if(response.ok){
+                alert("Vehículo eliminado correctamente");
+                console.log("Vehicle deleted successfully");
+                document.location.reload();
+            }else{
+                alert("Hubo un problema al eliminar el vehículo.");
+                console.error("Error deleting vehicle.");
+                throw new Error('Hubo un problema al eliminar el vehículo.');
+            }
+        })
+    }catch(error){
+        alert("Hubo un problema de red.");
+        console.error("Error de red:", error);
+    }
+}
 function loadPage(post_id) {
     // Obtener el formulario y agregar el evento de submit para la creación de la flota
     document.getElementById('postForm').addEventListener('submit', function(event) {
@@ -177,6 +202,7 @@ function loadPage(post_id) {
         }
     });
 
+    /**
     // Obtener el formulario y agregar el evento de submit para subir vehículos
     document.getElementById('uploadVehiclesForm').addEventListener('submit', function(event) {
         event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
@@ -253,6 +279,7 @@ function loadPage(post_id) {
             alert('Hubo un problema al crear el post.');
         });
     });
+    */
 
 
     fetch("/api/post/get?post_id=" + post_id, {
@@ -303,5 +330,64 @@ function loadPage(post_id) {
         .catch(error => {
             console.error('Error:', error);
             alert('Hubo un problema al cargar el post.');
+    })
+
+    document.getElementById("addVehicleButton").addEventListener("click", function (event) {
+        document.getElementById("vehicleFormSection").style.display = "block";
+        document.getElementById("addVehicleButton").style.display = "none";
+    })
+
+    document.getElementById("addVehicleBtn").addEventListener("click", function () {
+        const formData = new FormData();
+        formData.append('license_plate', document.getElementById('license_plate').value);
+        formData.append('brand', document.getElementById('brand').value);
+        formData.append('model', document.getElementById('model').value);
+        formData.append('registration_year', parseInt(document.getElementById('registration_year').value));
+        formData.append('price', parseFloat(document.getElementById('price').value));
+        formData.append('observations', document.getElementById('observations').value);
+        formData.append('vehicle_type', document.getElementById('vehicleType').value);
+        formData.append('fuel_type', document.getElementById('fuelType').value);
+        formData.append('post_id', post_id); // Aquí el `post_id` ya debería ser válido
+        formData.append('photo', document.getElementById('photo').files[0]); // Ahora enviamos el archivo, no el base64
+
+        fetch('/api/vehicle/create', {
+            method: 'POST',
+            body: formData        
+        }).then(response => {
+            if (response.ok) {
+                alert("Vehículo añadido correctamente");
+                console.log("Vehicle added successfully");
+                document.location.reload();
+            } else {
+                alert("Hubo un problema al añadir el vehículo.");
+                console.error("Error adding vehicle.");
+                throw new Error('Hubo un problema al añadir el vehículo.');
+            }
+        }).catch(error => {
+            console.error('Error al añadir el vehículo:', error);
+        });
+    })
+
+    document.getElementById("editPostButton").addEventListener("click", function (event) {
+        fetch('/api/post/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ post_id, title: document.getElementById("title").value, description: document.getElementById("description").value })
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("Post editado correctamente");
+                    console.log("Post edited successfully");
+                    document.location.reload();
+                } else {
+                    alert("Hubo un problema al editar el post.");
+                    console.error("Error editing post.");
+                    throw new Error('Hubo un problema al editar el post.');
+                }
+            })
+            .catch(error => {
+                alert("Hubo un problema de red.");
+                console.error("Error de red:", error);
+            });
     })
 }
