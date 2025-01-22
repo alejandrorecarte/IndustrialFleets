@@ -29,7 +29,7 @@ function verificarSesion() {
                 } else {
                     // Si la respuesta no es OK (por ejemplo, token inválido o expirado), mostrar los botones de login
                     console.log("Cookie not verified")
-                    window.location.href = '../index.html';
+                    window.location.href = '../index.html?back_url=/img/createPost.html';
                 }
             })
             .catch(error => {
@@ -110,7 +110,7 @@ function addVehicleToList(vehicleItem) {
     // Creamos el contenido HTML para el vehículo
     vehicleDiv.innerHTML = `
         <h3>${vehicleItem.brand} ${vehicleItem.model} (${vehicleItem.registration_year})</h3>
-        <p>Precio: $${vehicleItem.price}</p>
+        <p>Precio: ${vehicleItem.price}€</p>
         <p>${vehicleItem.observations}</p>
         <p>Tipo de Vehículo: ${vehicleItem.vehicleType}</p>
         <p>Combustible: ${vehicleItem.fuelType}</p>
@@ -201,3 +201,16 @@ document.getElementById('uploadVehiclesForm').addEventListener('submit', functio
         alert('Hubo un problema al crear el post.');
     });
 });
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById("backButton").addEventListener("click", function (event) {
+        document.location.href = '/img/home.html';
+    })
+    document.getElementById("homePageLogo").addEventListener("click", function (event) {
+        document.location.href = '/img/home.html';
+    })
+    document.getElementById("homePageTitle").addEventListener("click", function (event) {
+        document.location.href = '/img/home.html';
+    })
+})

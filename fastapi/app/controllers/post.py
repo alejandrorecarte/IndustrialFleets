@@ -1,10 +1,12 @@
 from models.post import Post
 from fastapi import HTTPException, status
-from controllers.queries import create_post_query, update_post_query, delete_post_query, get_post_query, get_post_last_query ,get_last_id, get_post_last_pages_query, check_post_access_query, get_post_user_query, get_post_user_pages_query
+from controllers.queries import get_total_price_query, create_post_query, update_post_query, delete_post_query, get_post_query, get_post_last_query ,get_last_id, get_post_last_pages_query, check_post_access_query, get_post_user_query, get_post_user_pages_query
 from database import execute_query, execute
 from models.user import User
 from controllers.exceptions import ControlledException
+from utils import calc_iva
 import os
+import math
 
 def check_post_access(user_email, post_id, db_connection):
     query = check_post_access_query()
@@ -23,15 +25,28 @@ def check_post_access(user_email, post_id, db_connection):
         status_code=status.HTTP_404_NOT_FOUND,
         detail="Document not found"
     )
+
+def total_price_getter(post_id, db_connection) -> float:
+    query = get_total_price_query()
+    params = (post_id)
     
-def post_formatter(post_nf) -> Post:
+    results = execute_query(query, params, db_connection)
+    
+    if results[0][0] == None:
+        return 0
+
+    return results[0][0]
+
+def post_formatter(post_nf, db_connection) -> Post:
     is_sold = 0
     if post_nf[4] == 1:
         is_sold = 1
         
     post_timestamp = int(post_nf[3].timestamp())
+    total_price = total_price_getter(post_nf[0], db_connection)
+    iva = calc_iva(total_price)
     
-    return Post(post_id=post_nf[0], title=post_nf[1], description=post_nf[2], post_timestamp=post_timestamp, is_sold=is_sold, user_email=post_nf[5])
+    return Post(post_id=post_nf[0], title=post_nf[1], description=post_nf[2], post_timestamp=post_timestamp, is_sold=is_sold, user_email=post_nf[5], total_price=total_price, iva=iva)
     
 
 def create_post(post: Post, db_connection) -> Post:
@@ -49,7 +64,7 @@ def create_post(post: Post, db_connection) -> Post:
     results = execute_query (query, post_id, db_connection)
     
     if results:
-        post = post_formatter(results[0])
+        post = post_formatter(results[0], db_connection)
         return post
     else:
         raise ControlledException("Could not create the post into BBDD")
@@ -80,7 +95,7 @@ def get_post(post_id: int, db_connection):
     
     result = execute_query(query, post_id, db_connection)
     
-    return post_formatter(result[0])
+    return post_formatter(result[0], db_connection)
 
 def get_post_user(user_email: str, page: int, db_connection):
     page_size = int(os.getenv("PAGE_SIZE"))
@@ -93,7 +108,7 @@ def get_post_user(user_email: str, page: int, db_connection):
     
     posts = []
     for post_nf in result:
-        posts.append(post_formatter(post_nf))
+        posts.append(post_formatter(post_nf, db_connection))
         
     return posts
 
@@ -116,7 +131,7 @@ def get_post_last(page: int, db_connection):
     
     posts = []
     for post_nf in result:
-        posts.append(post_formatter(post_nf))
+        posts.append(post_formatter(post_nf, db_connection))
         
     return posts
 
@@ -125,4 +140,4 @@ def get_post_last_pages(db_connection) -> int:
     
     result = execute_query(query, None, db_connection)
     
-    return int(result[0][0] / int(os.getenv("PAGE_SIZE")))
+    return math.ceil(result[0][0] / int(os.getenv("PAGE_SIZE")))
