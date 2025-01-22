@@ -44,7 +44,7 @@ nav h1 {
 }
 
 /* Botón para añadir post */
-#userPostsButton {
+#backButton {
     position: absolute;
     top: 20px;
     left: 20px;
@@ -58,13 +58,12 @@ nav h1 {
     transition: background-color 0.3s ease;
 }
 
-#logoutButton {
-    position: absolute;
-    top: 20px;
-    right: 20px;
+#editButton, #deleteButton {
+    position: relative;
     background-color: #ff7e5f;
     border: none;
     padding: 10px 15px;
+    margin: 5px;
     border-radius: 5px;
     font-size: 1rem;
     color: #fff;
@@ -72,7 +71,8 @@ nav h1 {
     transition: background-color 0.3s ease;
 }
 
-#logoutButton:hover, #userPostsButton:hover {
+
+#backButton:hover, #editButton:hover, #deleteButton:hover {
     background-color: #feb47b;
 }
 
@@ -84,36 +84,12 @@ nav h1 {
     margin: 20px 0;
 }
 
-#searchBar {
-    padding: 10px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-right: 10px;
-    width: 300px;
-    background-color: rgba(0, 0, 0, 0.6); /* Fondo oscuro */
-    color: #fff; /* Letras blancas */
+body main h1{
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #ffff;
+    text-align: center;
 }
-
-#searchBar::placeholder {
-    color: #ccc; /* Color del placeholder */
-}
-
-#addPostButton {
-    background-color: #ff7e5f;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    font-size: 1rem;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#addPostButton:hover {
-    background-color: #feb47b;
-}
-
 /* Main Section for Cards */
 #cardsSection {
     display: flex;
