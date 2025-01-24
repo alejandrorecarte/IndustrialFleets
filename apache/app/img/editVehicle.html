@@ -1,29 +1,29 @@
 <!DOCTYPE html>
 <html lang="es">
 
-<header>
-    <nav>
-        <img id= "homePageLogo" src="../favicon.ico" alt="Logo" style="width: 100px; height: 100px;">
-        <h1 id = "homePageTitle">Industrial Fleets</h1>
-        <button id="backButton">Volver</button>
-    </nav>
-</header>
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Vehículos</title>
+    <title>Editar Vehículo</title>
     <link rel="stylesheet" href="../css/editVehicle.css">
     <script src="../js/editVehicle.js"></script>
 </head>
 
 <body>
 
+    <header>
+        <nav>
+            <img id="homePageLogo" src="../favicon.ico" alt="Logo" style="width: 100px; height: 100px;">
+            <h1 id="homePageTitle">Industrial Fleets</h1>
+            <button id="backButton">Volver</button>
+        </nav>
+    </header>
 
     <!-- Formulario para editar vehículos -->
     <div id="vehicleFormSection" style="display:none">
         <h2>Editar Vehículo</h2>
-        <form id="vehicleForm">
+        <form id="vehicleEditForm">
+            <!-- vehicleForm -->
             <input type="text" id="license_plate" placeholder="Matrícula" required><br>
             <input type="text" id="brand" placeholder="Marca" required><br>
             <input type="text" id="model" placeholder="Modelo" required><br>
@@ -55,11 +55,12 @@
 
             <!-- Permitir solo imágenes -->
             <input type="file" id="photo" required accept="image/*"><br>
-            <button type="button" id="addVehicleBtn">Añadir Vehículo</button>
+            <!-- <button type="button" id="addVehicleBtn">Añadir Vehículo</button> -->
         </form>
     </div>
 
-    <button id="addVehicleButton">Añadir vehículo</button>
+    <button id="addVehicleButton">Guardar cambios</button>
+
 </body>
 
 </html>

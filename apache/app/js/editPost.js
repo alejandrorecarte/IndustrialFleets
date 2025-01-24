@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     post_id = parseInt(params.get('post_id'));
     verificarSesion();
     verificarAcceso(post_id);
-    
+
     document.getElementById("backButton").addEventListener("click", function (event) {
         document.location.href = '/img/userPosts.html';
     })
@@ -29,7 +29,7 @@ function getCookie(name) {
 }
 
 function verificarAcceso(post_id) {
-    fetch('/api/post/access?post_id='+ post_id, {
+    fetch('/api/post/access?post_id=' + post_id, {
         method: 'GET'
     })
         .then(response => {
@@ -120,33 +120,34 @@ function openVehicleWindow(license_plate) {
 }
 
 function deleteVehicle(license_plate) {
-    const body = {"license_plate": license_plate}
+    const body = { "license_plate": license_plate }
 
     const url = '/api/vehicle/delete';
-    try{
+    try {
         fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
         }).then(response => {
-            if(response.ok){
+            if (response.ok) {
                 alert("Vehículo eliminado correctamente");
                 console.log("Vehicle deleted successfully");
                 document.location.reload();
-            }else{
+            } else {
                 alert("Hubo un problema al eliminar el vehículo.");
                 console.error("Error deleting vehicle.");
                 throw new Error('Hubo un problema al eliminar el vehículo.');
             }
         })
-    }catch(error){
+    } catch (error) {
         alert("Hubo un problema de red.");
         console.error("Error de red:", error);
     }
 }
+
 function loadPage(post_id) {
     // Obtener el formulario y agregar el evento de submit para la creación de la flota
-    document.getElementById('postForm').addEventListener('submit', function(event) {
+    document.getElementById('postForm').addEventListener('submit', function (event) {
         event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
 
         // Recoger los datos del formulario
@@ -330,7 +331,7 @@ function loadPage(post_id) {
         .catch(error => {
             console.error('Error:', error);
             alert('Hubo un problema al cargar el post.');
-    })
+        })
 
     document.getElementById("addVehicleButton").addEventListener("click", function (event) {
         document.getElementById("vehicleFormSection").style.display = "block";
@@ -352,7 +353,7 @@ function loadPage(post_id) {
 
         fetch('/api/vehicle/create', {
             method: 'POST',
-            body: formData        
+            body: formData
         }).then(response => {
             if (response.ok) {
                 alert("Vehículo añadido correctamente");

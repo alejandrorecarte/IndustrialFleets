@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     post_id = parseInt(params.get('post_id'));
     verificarSesion();
     verificarAcceso(post_id);
-    
+
     document.getElementById("backButton").addEventListener("click", function (event) {
         document.location.href = '/img/editPost.html';
     })
@@ -27,7 +27,7 @@ function getCookie(name) {
 }
 
 function verificarAcceso(post_id) {
-    fetch('/api/post/access?post_id='+ post_id, {
+    fetch('/api/post/access?post_id=' + post_id, {
         method: 'GET'
     })
         .then(response => {
@@ -78,7 +78,7 @@ function verificarSesion() {
 
 function loadPage(post_id) {
     // Obtener el formulario y agregar el evento de submit para la edición de la flota
-    document.getElementById('postForm').addEventListener('submit', function(event) {
+    document.getElementById('postForm').addEventListener('submit', function (event) {
         event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
 
         // Recoger los datos del formulario

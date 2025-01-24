@@ -72,11 +72,11 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(response => {
                 if (response.ok) {
-                    if(backUrl === null){
+                    if (backUrl === null) {
                         window.location.href = '/img/home.html';
                     }
-                    else{
-                        window.location.href= backUrl
+                    else {
+                        window.location.href = backUrl
                     }
                 } else {
                     alert('Hubo un problema al iniciar sesión');
