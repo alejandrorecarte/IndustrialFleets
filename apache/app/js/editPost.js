@@ -79,13 +79,11 @@ function verificarSesion() {
 }
 
 // Inicializa el array de vehículos y el objeto de información de la flota
-let vehicles = [];
 let postInfo = {}; // Asegúrate de que postInfo contenga la información necesaria
 
 
 // Función para añadir el vehículo a la lista visual
 function addVehicleToList(vehicleItem) {
-    console.log("Añadiendo vehículo ", vehicleItem.license_plate)
 
     const vehicleList = document.getElementById('vehicleList');
     const vehicleDiv = document.createElement('div');
@@ -107,16 +105,13 @@ function addVehicleToList(vehicleItem) {
     `;
 
     vehicleList.appendChild(vehicleDiv);
-    vehicles.push(vehicleItem); // Añadir el vehículo al array de la flota
 
     // Limpiar el formulario
     document.getElementById('vehicleForm').reset();
 }
 
 function openVehicleWindow(license_plate) {
-    const encodedLicensePlate = encodeURIComponent(license_plate);
-    window.open('editVehicle.html?license_plate=' + encodedLicensePlate, '_blank', 'width=800,height=600');
-    ;
+    window.open(`editVehicle.html?${new URLSearchParams({ post_id, license_plate: license_plate }).toString()}`, '_blank', 'width=800,height=600');
 }
 
 function deleteVehicle(license_plate) {
@@ -163,125 +158,6 @@ function loadPage(post_id) {
         // Crear el objeto de parámetros
         postInfo = { title, description };
     });
-
-    // Botón para añadir vehículo
-    document.getElementById('addVehicleBtn').addEventListener('click', function () {
-        try {
-            const license_plate = document.getElementById('license_plate').value;
-            const brand = document.getElementById('brand').value;
-            const model = document.getElementById('model').value;
-            const registration_year = document.getElementById('registration_year').value;
-            const price = document.getElementById('price').value;
-            const observations = document.getElementById('observations').value;
-            const vehicleType = document.getElementById('vehicleType').value;
-            const fuelType = document.getElementById('fuelType').value;
-            const photo = document.getElementById('photo').files[0]; // Asegúrate de obtener el archivo como tal
-
-            // Validar campos requeridos
-            if (!license_plate || !brand || !model || !registration_year || !price || !observations || !vehicleType || !fuelType || !photo) {
-                throw new Error("Por favor, complete todos los campos requeridos.");
-            }
-
-            // Crear el objeto del vehículo
-            const vehicleItem = {
-                license_plate,
-                brand,
-                model,
-                registration_year,
-                price,
-                observations,
-                vehicleType,
-                fuelType,
-                photo // Guardamos el archivo directamente aquí, no base64
-            };
-
-            // Añadir el vehículo a la lista visual
-            addVehicleToList(vehicleItem);
-
-        } catch (error) {
-            alert(error.message);
-        }
-    });
-
-    /**
-    // Obtener el formulario y agregar el evento de submit para subir vehículos
-    document.getElementById('uploadVehiclesForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
-
-        if (vehicles.length === 0) {
-            alert("No hay vehículos para subir.");
-            return;
-        }
-
-        // Construir la URL para la subida de vehículos
-        const url = '/api/post/create';
-
-        // Enviar los datos al backend para crear el post
-        fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(postInfo)
-        })
-        .then(response => {
-            if (response.ok) {
-                response.json().then(data => {
-                    // Asegúrate de que el `post_id` es un número entero
-                    const postId = data.post.post_id;
-        
-                    if (!postId) {
-                        throw new Error("post_id no encontrado.");
-                    }
-        
-                    // Luego, para cada vehículo, enviar los datos con el `post_id` correcto
-                    vehicles.forEach(vehicle => {
-                        const formData = new FormData();
-                        formData.append('license_plate', vehicle.license_plate);
-                        formData.append('brand', vehicle.brand);
-                        formData.append('model', vehicle.model);
-                        formData.append('registration_year', vehicle.registration_year);
-                        formData.append('price', vehicle.price);
-                        formData.append('observations', vehicle.observations);
-                        formData.append('vehicle_type', vehicle.vehicleType);
-                        formData.append('fuel_type', vehicle.fuelType);
-                        formData.append('post_id', postId); // Aquí el `post_id` ya debería ser válido
-                        formData.append('photo', vehicle.photo); // Ahora enviamos el archivo, no el base64
-
-                        // Enviar los vehículos a la API
-                        fetch('/api/vehicle/create', {
-                            method: 'POST',
-                            body: formData
-                        })
-                        .then(response => {
-                            if (response.ok) {
-                                alert("Vehículo subido correctamente")
-                                console.log("Vehicle uploaded successfully");
-                            } else {
-                                alert("Hubo un problema al subir el vehículo.");
-                                console.error("Error uploading vehicle.");
-                                throw new Error('Hubo un problema al crear el post.');
-                            }
-                        })
-                        .catch(error => {
-                            alert("Hubo un problema de red.");
-                            console.error("Error de red:", error);
-                        });
-                    });
-                    
-                    alert("Post creado correctamente");
-                    // Redirigir al usuario a la página de inicio
-                    window.location.href = '/img/home.html';
-                });
-            } else {
-                throw new Error('Hubo un problema al crear el post.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Hubo un problema al crear el post.');
-        });
-    });
-    */
-
 
     fetch("/api/post/get?post_id=" + post_id, {
         method: 'GET'
@@ -333,40 +209,87 @@ function loadPage(post_id) {
             alert('Hubo un problema al cargar el post.');
         })
 
-    document.getElementById("addVehicleButton").addEventListener("click", function (event) {
+    document.getElementById("addVehicleButton").addEventListener("click", function () {
         document.getElementById("vehicleFormSection").style.display = "block";
+        document.getElementById("license_plate").focus()
+        document.getElementById("license_plate").value = "";
+        document.getElementById("brand").value = "";
+        document.getElementById("model").value = "";
+        document.getElementById("registration_year").value = "";
+        document.getElementById("price").value = "";
+        document.getElementById("observations").value = "";
+        document.getElementById("vehicleType").value = "";
+        document.getElementById("fuelType").value = "";
+        document.getElementById("photo").files[0] = null;
         document.getElementById("addVehicleButton").style.display = "none";
     })
 
     document.getElementById("addVehicleBtn").addEventListener("click", function () {
-        const formData = new FormData();
-        formData.append('license_plate', document.getElementById('license_plate').value);
-        formData.append('brand', document.getElementById('brand').value);
-        formData.append('model', document.getElementById('model').value);
-        formData.append('registration_year', parseInt(document.getElementById('registration_year').value));
-        formData.append('price', parseFloat(document.getElementById('price').value));
-        formData.append('observations', document.getElementById('observations').value);
-        formData.append('vehicle_type', document.getElementById('vehicleType').value);
-        formData.append('fuel_type', document.getElementById('fuelType').value);
-        formData.append('post_id', post_id); // Aquí el `post_id` ya debería ser válido
-        formData.append('photo', document.getElementById('photo').files[0]); // Ahora enviamos el archivo, no el base64
 
-        fetch('/api/vehicle/create', {
-            method: 'POST',
-            body: formData
-        }).then(response => {
-            if (response.ok) {
-                alert("Vehículo añadido correctamente");
-                console.log("Vehicle added successfully");
-                document.location.reload();
-            } else {
-                alert("Hubo un problema al añadir el vehículo.");
-                console.error("Error adding vehicle.");
-                throw new Error('Hubo un problema al añadir el vehículo.');
+        try {
+            const license_plate = document.getElementById('license_plate').value;
+            const brand = document.getElementById('brand').value;
+            const model = document.getElementById('model').value;
+            const registration_year = document.getElementById('registration_year').value;
+            const price = document.getElementById('price').value;
+            const observations = document.getElementById('observations').value;
+            const vehicleType = document.getElementById('vehicleType').value;
+            const fuelType = document.getElementById('fuelType').value;
+            const photo = document.getElementById('photo').files[0]; // Asegúrate de obtener el archivo como tal
+
+            // Validar campos requeridos
+            if (!license_plate || !brand || !model || !registration_year || !price || !observations || !vehicleType || !fuelType || !photo) {
+                throw new Error("Por favor, complete todos los campos requeridos.");
             }
-        }).catch(error => {
-            console.error('Error al añadir el vehículo:', error);
-        });
+
+            // Crear el objeto del vehículo
+            const vehicleItem = {
+                license_plate,
+                brand,
+                model,
+                registration_year,
+                price,
+                observations,
+                vehicleType,
+                fuelType,
+                photo // Guardamos el archivo directamente aquí, no base64
+            };
+
+            const formData = new FormData();
+            formData.append('license_plate', vehicleItem.license_plate);
+            formData.append('brand', vehicleItem.brand);
+            formData.append('model', vehicleItem.model);
+            formData.append('registration_year', vehicleItem.registration_year);
+            formData.append('price', vehicleItem.price);
+            formData.append('observations', vehicleItem.observations);
+            formData.append('vehicle_type', vehicleItem.vehicleType);
+            formData.append('fuel_type', vehicleItem.fuelType);
+            formData.append('post_id', post_id); // Aquí el `post_id` ya debería ser válido
+            formData.append('photo', vehicleItem.photo); // Ahora enviamos el archivo, no el base64
+    
+            fetch('/api/vehicle/create', {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    alert("Vehículo añadido correctamente");
+                    console.log("Vehicle added successfully");
+                    document.location.reload();
+                } else {
+                    alert("Hubo un problema al añadir el vehículo.");
+                    console.error("Error adding vehicle.");
+                    throw new Error('Hubo un problema al añadir el vehículo.');
+                }
+            }).catch(error => {
+                console.error('Error al añadir el vehículo:', error);
+            });
+
+            // Añadir el vehículo a la lista visual
+            addVehicleToList(vehicleItem);
+
+        } catch (error) {
+            alert(error.message);
+        }
     })
 
     document.getElementById("editPostButton").addEventListener("click", function (event) {
