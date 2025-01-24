@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from models.vehicle import Vehicle, VehicleType, FuelType
 from database import get_db_connection
 import logging
-from controllers.vehicle import create_vehicle, update_vehicle, delete_vehicle, get_vehicle, get_post_vehicles
+from controllers.vehicle import check_vehicle_access, create_vehicle, update_vehicle, delete_vehicle, get_vehicle, get_post_vehicles
 from utils import get_token_from_cookie
 from fastapi.responses import JSONResponse
 import os
@@ -99,7 +99,14 @@ def post_create_vehicle(
         )
 
 class UpdateVehicleRequest(BaseModel):
-    vehicle: Vehicle
+    license_plate: str
+    brand: str
+    model: str
+    registration_year: int
+    price: float
+    observations: str
+    vehicle_type: VehicleType
+    fuel_type: FuelType
 
 @router.post("/update", status_code=status.HTTP_200_OK)
 def post_update_vehicle(body: UpdateVehicleRequest , request: Request, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
@@ -175,3 +182,15 @@ def get_vehicle_by_post_id(post_id: int, request: Request, token: str = Depends(
             detail=str(error)
         )
     
+@router.get("/access", status_code=status.HTTP_200_OK)
+def get_access(license_plate: str, request: Request, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
+    user_email = token["user_email"]
+    try:
+        check_vehicle_access(user_email, license_plate, db_connection)
+        return {"access": "granted"}
+    except Exception as error:
+        logger.warning(str(error))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error)
+        )

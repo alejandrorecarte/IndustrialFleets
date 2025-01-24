@@ -110,8 +110,19 @@ function addVehicleToList(vehicleItem) {
     document.getElementById('vehicleForm').reset();
 }
 
+let popupWindow = null;
+
 function openVehicleWindow(license_plate) {
-    window.open(`editVehicle.html?${new URLSearchParams({ post_id, license_plate: license_plate }).toString()}`, '_blank', 'width=800,height=600');
+    // Abres la nueva ventana y guardas la referencia
+    popupWindow = window.open(`editVehicle.html?${new URLSearchParams({license_plate }).toString()}`, '_blank', 'width=800,height=600');
+    
+    // Compruebas si la ventana emergente se cierra y refrescas la página principal
+    const checkPopupClosed = setInterval(function() {
+        if (popupWindow.closed) {
+            clearInterval(checkPopupClosed);
+            location.reload();  // Refresca la página principal
+        }
+    }, 500); // Comprobar cada 500ms
 }
 
 function deleteVehicle(license_plate) {
