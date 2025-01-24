@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from models.user import User
 from database import get_db_connection
 import logging
-from controllers.post import create_post, update_post, delete_post, get_post, get_post_last, get_post_last_pages, get_post_user, get_post_user_pages
+from controllers.post import check_post_access, create_post, update_post, delete_post, get_post, get_post_last, get_post_last_pages, get_post_user, get_post_user_pages
 from models.post import Post
 from utils import get_token_from_cookie
 
@@ -29,10 +29,15 @@ def post_create_post(body: CreatePostRequest, request: Request, token: str = Dep
             detail=str(error)
         )
 
+class UpdatePostRequest(BaseModel):
+    title: str
+    description: str
+
 @router.post("/update", status_code=status.HTTP_200_OK)
-def post_update_post(post: Post, request: Request, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
+def post_update_post(body: UpdatePostRequest, request: Request, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
     user_email = token["user_email"]
     try:
+        post = Post(title = body.title, description = body.description, user_email = user_email)
         post = update_post(post, user_email, db_connection)
         return {"post": post.model_dump()}
     except HTTPException as error:
@@ -49,7 +54,7 @@ def post_update_post(post: Post, request: Request, token: str = Depends(get_toke
         )
     
 class DeletePostRequest(BaseModel):
-    post_id: str
+    post_id: int
 
 @router.post("/delete", status_code=status.HTTP_200_OK)
 def post_delete_post(body: DeletePostRequest, request: Request, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
@@ -83,8 +88,11 @@ def get_post_by_id(post_id: int, request: Request, token: str = Depends(get_toke
                 )
         
 @router.get("/user", status_code=status.HTTP_200_OK)
-def get_user_post(user_email: str, page: int, request: Request, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
+def get_user_post(page: int, user_email: str = None, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
     try:
+        if user_email is None:        
+            user_email = token["user_email"]
+
         posts = get_post_user(user_email, page, db_connection)
         posts_json = [post.model_dump() for post in posts]
         
@@ -111,3 +119,16 @@ def get_last_post(page: int, request: Request, token: str = Depends(get_token_fr
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail=str(error)
                 )
+
+@router.get("/access", status_code=status.HTTP_200_OK)
+def get_access(post_id: int, request: Request, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
+    user_email = token["user_email"]
+    try:
+        check_post_access(user_email, post_id, db_connection)
+        return {"access": "granted"}
+    except Exception as error:
+        logger.warning(str(error))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error)
+        )

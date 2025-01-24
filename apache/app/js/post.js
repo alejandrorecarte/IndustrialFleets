@@ -35,7 +35,7 @@ function verificarSesion() {
                 } else {
                     // Si la respuesta no es OK (por ejemplo, token inválido o expirado), mostrar los botones de login
                     console.log("Cookie not verified")
-                    window.location.href = '../index.html?back_url=/img/post.html?post_id='+post_id;
+                    window.location.href = '../index.html?back_url=/img/post.html?post_id=' + post_id;
                 }
             })
             .catch(error => {
@@ -68,7 +68,7 @@ function loadPost(post_id) {
                 document.getElementById('postTitle').innerText = post.title;
                 document.getElementById('postDescription').innerText = post.description;
                 // Suponiendo que el timestamp es el de tu objeto post
-                let timestamp = post.post_timestamp*1000;  // Ejemplo: 1674243600000
+                let timestamp = post.post_timestamp * 1000;  // Ejemplo: 1674243600000
 
                 // Crear un objeto Date a partir del timestamp
                 let date = new Date(timestamp);
@@ -85,7 +85,7 @@ function loadPost(post_id) {
 
                 // Asignar la fecha formateada al campo input
                 document.getElementById('postCreatedAt').value = formattedDate;
-                document.getElementById('postTotalPrice').value = post.total_price.toFixed(2) + "€";
+                document.getElementById('postTotalPrice').value = (parseFloat(post.total_price) + parseFloat(post.iva)).toFixed(2) + "€";
                 document.getElementById('postIva').value = post.iva.toFixed(2) + "€ (21%)";
 
                 fetch(`/api/vehicle/post?post_id=${post_id}`, {
@@ -151,8 +151,7 @@ function addVehicleToList(vehicleItem) {
         <p>Tipo de Vehículo: ${vehicleType}</p>
         <p>Combustible: ${fuelType}</p>
         <p>Matrícula: ${vehicleItem.license_plate}</p>
-        <img src="${imageBase64}" alt="Foto del vehículo" style="width: 100px; margin: 5px;">
-    `;
+        <img src="${imageBase64}" alt="Foto del vehículo" style="width: 100px; margin: 5px;">   `;
 
     vehicleList.appendChild(vehicleDiv);
 }

@@ -81,7 +81,6 @@ def update_post(post: Post, user_email: str, db_connection) -> Post:
     return post
 
 def delete_post(post_id: int, user_email: str, db_connection):
-    # TODO: Eliminar los vehículos asociados en cascada
     check_post_access(user_email, post_id, db_connection)
     
     query = delete_post_query()
@@ -118,7 +117,7 @@ def get_post_user_pages(user_email:str,  db_connection) -> int:
     
     result = execute_query(query, user_email, db_connection)
     
-    return int(result[0][0] / int(os.getenv("PAGE_SIZE")))
+    return math.ceil(result[0][0] / int(os.getenv("PAGE_SIZE")))
     
 def get_post_last(page: int, db_connection):
     page_size = int(os.getenv("PAGE_SIZE"))

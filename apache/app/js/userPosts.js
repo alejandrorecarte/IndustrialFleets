@@ -39,7 +39,7 @@ function verificarSesion() {
                 } else {
                     // Si la respuesta no es OK (por ejemplo, token inválido o expirado), mostrar los botones de login
                     console.log("Cookie not verified")
-                    window.location.href = '../index.html?back_url=/img/home.html?page=' + page;
+                    window.location.href = '../index.html?back_url=/img/userPosts.html?page=' + page;
                 }
             })
             .catch(error => {
@@ -50,36 +50,10 @@ function verificarSesion() {
 
 document.addEventListener('DOMContentLoaded', function () {
     console.log("Adding event listeners")
-
-    document.getElementById("addPostButton").addEventListener("click", function (event) {
+    document.getElementById("backButton").addEventListener("click", function (event) {
         event.preventDefault();
-        window.location.href = '/img/createPost.html';  // Asegúrate de que la ruta sea la correcta
+        window.location.href = '/img/home.html';  // Asegúrate de que la ruta sea la correcta
     });
-
-    document.getElementById("userPostsButton").addEventListener("click", function (event) {
-        event.preventDefault();
-        window.location.href = '/img/userPosts.html';  // Asegúrate de que la ruta sea la correcta
-    });
-
-    document.getElementById("logoutButton").addEventListener("click", function () {
-        fetch('/api/users/logout', {
-            method: 'POST'
-        })
-            .then(response => {
-                if (response.ok) {
-                    // Si la respuesta es OK (status 200), el token es válido
-                    console.log("Session Closed")
-                    window.location.href = '../index.html?back_url=/img/home.html?page=' + page;
-                } else {
-                    console.log("Session not closed")
-                    alert("No se pudo cerrar la sesión")
-                }
-            })
-            .catch(error => {
-                console.error('Error al verificar la sesión:', error);
-                mostrarBotonesLoginRegistro(authButtons);  // Si hay un error, mostrar los botones de login y registro
-            });
-    })
 });
 
 
@@ -97,8 +71,45 @@ function createCard(title, description, postId) {
     const cardDescription = document.createElement('p');
     cardDescription.textContent = description;
 
+    const cardEditButton = document.createElement('button');
+    cardEditButton.id = 'editButton';
+    cardEditButton.textContent = 'Editar';
+    cardEditButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        window.location.href = `editPost.html?post_id=${postId}`; // Redirigir a editPost.html con el id del post
+    })
+
+    const cardDeleteButton = document.createElement('button');
+    cardDeleteButton.id = 'deleteButton';
+    cardDeleteButton.textContent = 'Eliminar';
+    cardDeleteButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const confirmacion = confirm("¿Estás seguro de que deseas eliminar este elemento?");
+
+        // Si el usuario confirma la eliminación
+        if (confirmacion) {
+            // Aquí puedes agregar el código para realizar la eliminación
+            fetch(`/api/post/delete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ post_id: postId })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert("Elemento eliminado.");
+                    window.location.reload();
+                }else{
+                    alert("Hubo un problema al eliminar el elemento.");
+                    console.error("Error eliminando el elemento.");
+                }
+            })
+        }
+    })
+
     card.appendChild(cardTitle);
     card.appendChild(cardDescription);
+    card.appendChild(cardEditButton);
+    card.appendChild(cardDeleteButton);
 
     return card;
 }
@@ -107,7 +118,7 @@ function createCard(title, description, postId) {
 function loadCards(cardsSection, page = 0) {
     page--
     console.log("Cargando tarjetas de la página:", page);
-    const url = `/api/post/last?page=${page}`; // Construir la URL con el parámetro page
+    const url = `/api/post/user?page=${page}`; // Construir la URL con el parámetro page
     fetch(url)
         .then(response => response.json())
         .then(data => {
@@ -138,7 +149,7 @@ function loadCards(cardsSection, page = 0) {
             button.disabled = true;
         }
         button.addEventListener('click', function() { 
-            window.location.href = `/img/home.html?page=${i}`;
+            window.location.href = `/img/userPosts.html?page=${i}`;
         });
         paginationControls.appendChild(button); // Asegúrate de agregar el botón al contenedor
     }

@@ -12,7 +12,7 @@ CREATE TABLE Posts (
   post_timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   is_sold BOOLEAN DEFAULT false,
   user_email varchar(255),
-  FOREIGN KEY (user_email) REFERENCES Users(email)
+  FOREIGN KEY (user_email) REFERENCES Users(email) ON DELETE CASCADE
 );
 
 CREATE TABLE Vehicles (
@@ -26,5 +26,5 @@ CREATE TABLE Vehicles (
   fuel_type varchar(25) NOT NULL,
   photo LONGBLOB,
   post_id INT,
-  FOREIGN KEY (post_id) REFERENCES Posts(post_id)
+  FOREIGN KEY (post_id) REFERENCES Posts(post_id) ON DELETE CASCADE
 );
