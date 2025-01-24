@@ -153,7 +153,7 @@ def post_delete_vehicle(body: DeleteVehicleRequest, request: Request, token: str
 def get_vehicle_by_license_plate(license_plate: str, request: Request, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
     try:
         vehicle = get_vehicle(license_plate, db_connection)
-        return JSONResponse(content={"vehicle": vehicle_getter(vehicle)})
+        return {"vehicle": vehicle_getter(vehicle)}
     
     except Exception as error:
         logger.warning(str(error))
