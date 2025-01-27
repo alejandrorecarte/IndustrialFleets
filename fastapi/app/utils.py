@@ -1,5 +1,6 @@
 import bcrypt
 import jwt
+import re
 import os
 from fastapi import HTTPException, status, Request
 from datetime import datetime, timedelta, timezone
@@ -58,3 +59,20 @@ def create_token(email: str):
     
 def calc_iva(price: float) -> float:
     return price * 0.21
+
+
+def validate_password_strength(password):
+    pattern = r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+    
+    if re.match(pattern, password) and len(password) >= 8:
+        return True
+    else:
+        return False
+    
+
+def validate_email(email):
+    pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    if re.match(pattern, email):
+        return True
+    else:
+        return False

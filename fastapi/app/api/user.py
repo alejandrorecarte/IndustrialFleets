@@ -4,7 +4,7 @@ from models.user import User
 from database import get_db_connection
 import logging
 from controllers.user import register, login
-from utils import get_token_from_cookie
+from utils import get_token_from_cookie, validate_email, validate_password_strength
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +20,19 @@ class RegisterRequest(BaseModel):
 def post_register(variables: RegisterRequest, response: Response, db_connection=Depends(get_db_connection)):
     """Registrar un nuevo usuario y devolver el token"""
     try:
+        if not validate_email(variables.email):
+            logger.debug("Invalid email")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid email"
+            )
+        elif not validate_password_strength(variables.password):
+            logger.debug("Invalid password")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Password is not strong enough"
+            )
+            
         user = User(email=variables.email, name=variables.name, last_name=variables.last_name, password=variables.password)
         register(user, db_connection)
         access_token = login(email=variables.email, password=variables.password, db_connection=db_connection)
