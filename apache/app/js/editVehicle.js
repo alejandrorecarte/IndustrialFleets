@@ -1,10 +1,10 @@
-let post_id = null
+let license_plate = null
 
 document.addEventListener('DOMContentLoaded', function () {
     const params = new URLSearchParams(window.location.search);
-    post_id = parseInt(params.get('post_id'));
+    license_plate = params.get('license_plate');
     verificarSesion();
-    verificarAcceso(post_id);
+    verificarAcceso(license_plate);
 
     document.getElementById("backButton").addEventListener("click", function (event) {
         document.location.href = '/img/editPost.html';
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById("homePageTitle").addEventListener("click", function (event) {
         document.location.href = '/img/home.html';
     })
-    loadPage(post_id);
+    loadVehicleData(license_plate);
 
 })
 
@@ -26,23 +26,23 @@ function getCookie(name) {
     if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
-function verificarAcceso(post_id) {
-    fetch('/api/post/access?post_id=' + post_id, {
+function verificarAcceso(license_plate) {
+    fetch('/api/vehicle/access?license_plate=' + license_plate, {
         method: 'GET'
     })
         .then(response => {
             if (response.ok) {
                 // Si la respuesta es OK (status 200), el token es válido
-                console.log("Post access verified")
+                console.log("Vehicle access verified")
             } else {
                 // Si la respuesta no es OK (por ejemplo, token inválido o expirado), mostrar los botones de login
-                console.log("Post access not verified")
+                console.log("Vehicle access not verified")
                 window.location.href = '../index.html';
             }
         })
         .catch(error => {
             alert("Hubo un problema de red.");
-            window.location.href = '../index.html';
+            window.close();
         });
 }
 
@@ -76,7 +76,7 @@ function verificarSesion() {
 }
 
 
-function loadPage(post_id) {
+/*function loadPage(license_plate) {
     // Obtener el formulario y agregar el evento de submit para la edición de la flota
     document.getElementById('postForm').addEventListener('submit', function (event) {
         event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
@@ -94,48 +94,109 @@ function loadPage(post_id) {
         // Crear el objeto de parámetros
         postInfo = { title, description };
     });
+}*/
 
-    // Botón para añadir vehículo
-    document.getElementById('addVehicleBtn').addEventListener('click', function () {
-        try {
-            const license_plate = document.getElementById('license_plate').value;
-            const brand = document.getElementById('brand').value;
-            const model = document.getElementById('model').value;
-            const registration_year = document.getElementById('registration_year').value;
-            const price = document.getElementById('price').value;
-            const observations = document.getElementById('observations').value;
-            const vehicleType = document.getElementById('vehicleType').value;
-            const fuelType = document.getElementById('fuelType').value;
-            const photo = document.getElementById('photo').files[0]; // Asegúrate de obtener el archivo como tal
 
-            // Validar campos requeridos
-            if (!license_plate || !brand || !model || !registration_year || !price || !observations || !vehicleType || !fuelType || !photo) {
-                throw new Error("Por favor, complete todos los campos requeridos.");
+function loadVehicleData(license_plate) {
+    fetch(`/api/vehicle/get?license_plate=${license_plate}`, { method: "GET" })
+        .then(response => response.json())
+        .then(data => {
+            const vehicle = data.vehicle;
+
+            // Llenar los campos del formulario
+            document.getElementById("license_plate").value = vehicle.license_plate || "";
+            document.getElementById("brand").value = vehicle.brand || "";
+            document.getElementById("model").value = vehicle.model || "";
+            document.getElementById("registration_year").value = vehicle.registration_year || "";
+            document.getElementById("price").value = vehicle.price || "";
+            document.getElementById("observations").value = vehicle.observations || "";
+            document.getElementById("vehicleType").value = vehicle.vehicleType || "";
+            document.getElementById("fuelType").value = vehicle.fuelType || "";
+
+            // Mostrar imagen existente
+            if (vehicle.photo) {
+                const photoPreview = document.getElementById("photoPreview");
+                photoPreview.src = `data:image/png;base64,${vehicle.photo}`;
+                photoPreview.style.display = "block";
             }
-
-            // Crear el objeto del vehículo
-            const vehicleItem = {
-                license_plate,
-                brand,
-                model,
-                registration_year,
-                price,
-                observations,
-                vehicleType,
-                fuelType,
-                photo // Guardamos el archivo directamente aquí, no base64
-            };
-
-            // Añadir el vehículo a la lista visual
-            addVehicleToList(vehicleItem);
-
-        } catch (error) {
-            alert(error.message);
-        }
-    });
+        })
+        .catch(error => console.error("Error al cargar los datos del vehículo:", error));
 }
 
+function handleImagePreview(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const photoPreview = document.getElementById("photoPreview");
+            photoPreview.src = e.target.result;
+            photoPreview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+    }
+}
 
+function saveVehicleChanges() {
+    const license_plate = document.getElementById("license_plate").value.trim();
+    const brand = document.getElementById("brand").value.trim();
+    const model = document.getElementById("model").value.trim();
+    const registration_year = document.getElementById("registration_year").value.trim();
+    const price = parseFloat(document.getElementById("price").value.trim());
+    const observations = document.getElementById("observations").value.trim();
+    const vehicleType = document.getElementById("vehicleType").value.trim();
+    const fuelType = document.getElementById("fuelType").value.trim();
+    const photoInput = document.getElementById("photo");
 
+    // Validar campos obligatorios
+    if (!license_plate || !brand || !model || !registration_year || isNaN(price)) {
+        alert('Por favor, complete todos los campos obligatorios.');
+        return;
+    }
 
-/*141 editPost.js loadPage*/
+    const vehicleData = {
+        license_plate,
+        brand,
+        model,
+        registration_year: parseInt(registration_year),
+        price,
+        observations,
+        vehicleType,
+        fuelType,
+    };
+
+    // Adjuntar imagen si se seleccionó una nueva
+    if (photoInput.files.length > 0) {
+        const file = photoInput.files[0];
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            vehicleData.photo = e.target.result.split(',')[1]; // Convertir a base64
+            sendUpdateRequest(vehicleData);
+        };
+        reader.readAsDataURL(file);
+    } else {
+        sendUpdateRequest(vehicleData);
+    }
+}
+
+function sendUpdateRequest(vehicleData) {
+    fetch('/api/vehicle/update', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(vehicleData)
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Vehículo actualizado correctamente.');
+                window.location.href = '/img/home.html';
+            } else {
+                alert('Error al actualizar el vehículo: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error al actualizar el vehículo:', error);
+            alert('Error al actualizar el vehículo. Consulte la consola para más detalles.');
+        });
+}
