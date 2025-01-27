@@ -17,6 +17,13 @@ document.addEventListener('DOMContentLoaded', function () {
     })
     loadVehicleData(license_plate);
 
+    // Configurar el evento para el botón "Reemplazar imagen"
+    document.getElementById("editVehiclePhotoButton").addEventListener("click", function () {
+        document.getElementById("photo").click(); // Simula un clic en el input tipo file
+    });
+
+    // Guardar los cambios al hacer clic en el botón "Guardar cambios"
+    document.getElementById("addVehicleBtn").addEventListener("click", saveVehicleChanges);
 })
 
 // Obtener el valor de una cookie por su nombre
@@ -103,18 +110,34 @@ function loadVehicleData(license_plate) {
         .then(data => {
             const vehicle = data.vehicle;
 
-            // Llenar los campos del formulario
+            // Llenar los campos del formulario con los valores recuperados del servidor
             document.getElementById("license_plate").value = vehicle.license_plate || "";
             document.getElementById("brand").value = vehicle.brand || "";
             document.getElementById("model").value = vehicle.model || "";
             document.getElementById("registration_year").value = vehicle.registration_year || "";
             document.getElementById("price").value = vehicle.price || "";
             document.getElementById("observations").value = vehicle.observations || "";
-            document.getElementById("vehicleType").value = vehicle.vehicleType || "";
-            document.getElementById("fuelType").value = vehicle.fuelType || "";
 
-            // Mostrar imagen existente
-            if (vehicle.photo) {
+            // Seleccionar el tipo de vehículo en el desplegable
+            const vehicleTypeSelect = document.getElementById("vehicleType");
+            for (let i = 0; i < vehicleTypeSelect.options.length; i++) {
+                if (vehicleTypeSelect.options[i].value === vehicle.vehicle_type) {
+                    vehicleTypeSelect.selectedIndex = i;
+                    break;
+                }
+            }
+
+            // Seleccionar el tipo de combustible en el desplegable
+            const fuelTypeSelect = document.getElementById("fuelType");
+            for (let i = 0; i < fuelTypeSelect.options.length; i++) {
+                if (fuelTypeSelect.options[i].value === vehicle.fuel_type) {
+                    fuelTypeSelect.selectedIndex = i;
+                    break;
+                }
+            }
+
+           // Mostrar la imagen actual si existe
+           if (vehicle.photo) {
                 const photoPreview = document.getElementById("photoPreview");
                 photoPreview.src = `data:image/png;base64,${vehicle.photo}`;
                 photoPreview.style.display = "block";
@@ -123,6 +146,8 @@ function loadVehicleData(license_plate) {
         .catch(error => console.error("Error al cargar los datos del vehículo:", error));
 }
 
+
+// Manejador para la vista previa de la imagen
 function handleImagePreview(event) {
     const file = event.target.files[0];
     if (file) {
@@ -134,6 +159,20 @@ function handleImagePreview(event) {
         };
         reader.readAsDataURL(file);
     }
+}
+
+
+// Función para eliminar la foto del vehículo
+function deleteVehiclePhoto() {
+    const photoPreview = document.getElementById("photoPreview");
+    const deleteButton = document.getElementById("deletePhotoBtn");
+
+    // Eliminar la imagen de la vista previa
+    photoPreview.src = "";
+    photoPreview.style.display = "none";
+
+    // Ocultar el botón de eliminar foto
+    deleteButton.style.display = "none";
 }
 
 function saveVehicleChanges() {
@@ -160,8 +199,8 @@ function saveVehicleChanges() {
         registration_year: parseInt(registration_year),
         price,
         observations,
-        vehicleType,
-        fuelType,
+        vehicle_type: vehicleType,
+        fuel_type: fuelType,
     };
 
     // Adjuntar imagen si se seleccionó una nueva
@@ -174,29 +213,33 @@ function saveVehicleChanges() {
         };
         reader.readAsDataURL(file);
     } else {
+        // Si no se seleccionó una nueva imagen, enviar la foto actual (si existe) o null
+        vehicleData.photo = (document.getElementById("photoPreview").src) ? document.getElementById("photoPreview").src.split(',')[1] : null;
         sendUpdateRequest(vehicleData);
     }
 }
 
+// Enviar la solicitud de actualización
 function sendUpdateRequest(vehicleData) {
     fetch('/api/vehicle/update', {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
         },
-        body: JSON.stringify(vehicleData)
+        body: JSON.stringify(vehicleData),
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Vehículo actualizado correctamente.');
-                window.location.href = '/img/home.html';
-            } else {
-                alert('Error al actualizar el vehículo: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error al actualizar el vehículo:', error);
-            alert('Error al actualizar el vehículo. Consulte la consola para más detalles.');
-        });
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Vehículo actualizado correctamente.');
+            window.location.href = '/img/home.html'; // Redirigir al inicio después de actualizar
+        } else {
+            alert('Error al actualizar el vehículo: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error al actualizar el vehículo:', error);
+        alert('Error al actualizar el vehículo. Consulte la consola para más detalles.');
+    });
 }
+

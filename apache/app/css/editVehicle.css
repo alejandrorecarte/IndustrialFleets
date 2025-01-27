@@ -164,7 +164,7 @@ h1 {
     border-color: #ff7e5f;
 }
 
-#addVehicleButton, #editPostButton {
+#addVehicleButton, #editPostButton , #editVehiclePhotoButton{
     background-color: #ff7e5f;
     border: none;
     padding: 12px 20px;
@@ -175,7 +175,7 @@ h1 {
     transition: background-color 0.3s ease;
 }
 
-#addVehicleBtn, #addPostBtn{
+#addVehicleBtn, #addPostBtn, #editVehiclePhotoButton{
     background-color: #ff7e5f;
     border: none;
     padding: 12px 20px;
@@ -188,7 +188,7 @@ h1 {
     margin-top: 20px;
 }
 
-#addVehicleBtn:hover, #addPostBtn:hover, #editPostButton:hover, #addVehicleButton:hover {
+#addVehicleBtn:hover, #addPostBtn:hover, #editPostButton:hover, #addVehicleButton:hover, #editVehiclePhotoButton:hover {
     background-color: #feb47b;
 }
 
@@ -273,4 +273,10 @@ h1 {
     .vehicle-item img {
         max-width: 150px; /* Aseguramos que las imágenes no sean demasiado grandes */
     }
+}
+
+#photoPreview {
+    display: block;
+    margin: 0 auto;
+    
 }

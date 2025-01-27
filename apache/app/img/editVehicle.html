@@ -6,10 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editar Vehículo</title>
     <link rel="stylesheet" href="../css/editVehicle.css">
-    <script src="../js/editVehicle.js" defer></script>
+    <script src="../js/editVehicle.js"></script>
 </head>
 
 <body>
+
     <header>
         <nav>
             <img id="homePageLogo" src="../favicon.ico" alt="Logo" style="width: 100px; height: 100px;">
@@ -19,7 +20,7 @@
     </header>
 
     <h1>Editar Vehículo</h1>
-
+    <!-- Formulario para editar vehículos -->
     <div id="vehicleFormSection">
         <form id="vehicleEditForm">
             <label for="labelMatricula">Matricula:</label>
@@ -65,15 +66,26 @@
 
             <div id="imageSection">
                 <label for="photo">Foto del vehículo:</label>
-                <img id="photoPreview" alt="Vista previa de la foto"
+                <!-- <img id="photoPreview" alt="Vista previa de la foto"
                     style="width: 150px; display: none; margin-bottom: 10px;"><br>
-                <input type="file" id="photo" name="photo" accept="image/*">
+                <button id="deletePhotoBtn" style="display:none;">Eliminar / Remplazar imagen</button>
+                <input type="file" id="photo" name="photo" accept="image/*" onchange="handleImagePreview(event)">                
                 <p id="photoMessage">Si desea reemplazar la imagen existente, seleccione una nueva.</p>
-            </div><br>
+             -->
 
-            <button type="submit" id="saveVehicleBtn">Guardar cambios</button>
+            <input type="file" id="photo" name="photo" accept="image/*" style="display:none" onchange="handleImagePreview(event)">
+            <img id="photoPreview" alt="Vista previa de la foto" style="width: 150px; display: none; margin-bottom: 10px;">
+            <button type="button" id="editVehiclePhotoButton">Reemplazar imagen</button>
+
+            <form id="uploadVehiclesForm" style="display: none;">
+                <button type="submit" id="addVehicleBtn">Guardar cambios</button>
+            </form>
+
+            </div><br>
         </form>
     </div>
+
+
 </body>
 
 </html>
