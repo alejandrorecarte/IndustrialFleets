@@ -6,26 +6,50 @@ document.addEventListener('DOMContentLoaded', function () {
     license_plate = params.get('license_plate');
     verificarSesion();
     verificarAcceso(license_plate);
-
-    document.getElementById("backButton").addEventListener("click", function (event) {
-        document.location.href = '/img/editPost.html';
-    })
-    document.getElementById("homePageLogo").addEventListener("click", function (event) {
-        document.location.href = '/img/home.html';
-    })
-    document.getElementById("homePageTitle").addEventListener("click", function (event) {
-        document.location.href = '/img/home.html';
-    })
     loadVehicleData(license_plate);
 
-    // Configurar el evento para el botón "Reemplazar imagen"
-    document.getElementById("editVehiclePhotoButton").addEventListener("click", function () {
-        document.getElementById("photo").click(); // Simula un clic en el input tipo file
-    });
+    document.getElementById('updateVehiclesForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
 
-    // Guardar los cambios al hacer clic en el botón "Guardar cambios"
-    document.getElementById("addVehicleBtn").addEventListener("click", saveVehicleChanges);
-})
+        const formData = new FormData();
+        formData.append('license_plate', document.getElementById('license_plate').value);
+        formData.append('brand', document.getElementById('brand').value);
+        formData.append('model', document.getElementById('model').value);
+        formData.append('registration_year', document.getElementById('registration_year').value);
+        formData.append('price', document.getElementById('price').value);
+        formData.append('observations', document.getElementById('observations').value);
+        formData.append('vehicle_type', document.getElementById('vehicleType').value);
+        formData.append('fuel_type', document.getElementById('fuelType').value);
+
+        let photo = photoPreviewData;
+
+        if (document.getElementById('photo').files.length > 0) {
+            photo = document.getElementById('photo').files[0];
+        }
+
+        formData.append('photo', photo); // Ahora enviamos el archivo, no el base64
+
+        // Enviar los vehículos a la API
+        fetch('/api/vehicle/update', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert("Vehículo subido correctamente")
+                    console.log("Vehicle uploaded successfully");
+                } else {
+                    alert("Hubo un problema al subir el vehículo.");
+                    console.error("Error uploading vehicle.");
+                    throw new Error('Hubo un problema al crear el post.');
+                }
+            })
+            .catch(error => {
+                alert("Hubo un problema de red.");
+                console.error("Error de red:", error);
+            });
+    });
+});
 
 // Obtener el valor de una cookie por su nombre
 function getCookie(name) {
@@ -84,27 +108,6 @@ function verificarSesion() {
 }
 
 
-/*function loadPage(license_plate) {
-    // Obtener el formulario y agregar el evento de submit para la edición de la flota
-    document.getElementById('postForm').addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
-
-        // Recoger los datos del formulario
-        const title = document.getElementById('title').value.trim();
-        const description = document.getElementById('description').value.trim();
-
-        // Validar que los campos no estén vacíos
-        if (!title || !description) {
-            alert('Por favor, complete todos los campos.');
-            return;
-        }
-
-        // Crear el objeto de parámetros
-        postInfo = { title, description };
-    });
-}*/
-
-
 function loadVehicleData(license_plate) {
     fetch(`/api/vehicle/get?license_plate=${license_plate}`, { method: "GET" })
         .then(response => response.json())
@@ -112,12 +115,12 @@ function loadVehicleData(license_plate) {
             const vehicle = data.vehicle;
 
             // Llenar los campos del formulario con los valores recuperados del servidor
-            document.getElementById("license_plate").value = vehicle.license_plate || "";
-            document.getElementById("brand").value = vehicle.brand || "";
-            document.getElementById("model").value = vehicle.model || "";
-            document.getElementById("registration_year").value = vehicle.registration_year || "";
-            document.getElementById("price").value = vehicle.price || "";
-            document.getElementById("observations").value = vehicle.observations || "";
+            document.getElementById("license_plate").value = vehicle.license_plate;
+            document.getElementById("brand").value = vehicle.brand;
+            document.getElementById("model").value = vehicle.model;
+            document.getElementById("registration_year").value = parseInt(vehicle.registration_year);
+            document.getElementById("price").value = parseFloat(vehicle.iva).toFixed(2);
+            document.getElementById("observations").value = vehicle.observations;
 
             // Seleccionar el tipo de vehículo en el desplegable
             const vehicleTypeSelect = document.getElementById("vehicleType");
@@ -137,8 +140,8 @@ function loadVehicleData(license_plate) {
                 }
             }
 
-           // Mostrar la imagen actual si existe
-           if (vehicle.photo) {
+            // Mostrar la imagen actual si existe
+            if (vehicle.photo) {
                 photoPreviewData = vehicle.photo;
                 const photoPreview = document.getElementById("photoPreview");
                 photoPreview.src = `data:image/png;base64,${vehicle.photo}`;
@@ -162,84 +165,3 @@ function handleImagePreview(event) {
         reader.readAsDataURL(file);
     }
 }
-
-
-// Función para eliminar la foto del vehículo
-function deleteVehiclePhoto() {
-    const photoPreview = document.getElementById("photoPreview");
-    const deleteButton = document.getElementById("deletePhotoBtn");
-
-    // Eliminar la imagen de la vista previa
-    photoPreview.src = "";
-    photoPreview.style.display = "none";
-
-    // Ocultar el botón de eliminar foto
-    deleteButton.style.display = "none";
-}
-
-function saveVehicleChanges(event) {
-    event.preventDefault(); // Evitar que el formulario se envíe de forma tradicional
-
-    const license_plate = document.getElementById("license_plate").value.trim();
-    const brand = document.getElementById("brand").value.trim();
-    const model = document.getElementById("model").value.trim();
-    const registration_year = document.getElementById("registration_year").value.trim();
-    const price = parseFloat(document.getElementById("price").value.trim());
-    const observations = document.getElementById("observations").value.trim();
-    const vehicleType = document.getElementById("vehicleType").value.trim();
-    const fuelType = document.getElementById("fuelType").value.trim();
-
-    let photo = photoPreviewData;
-
-    if (document.getElementById("photo").files[0]) {
-        const photoInput = document.getElementById("photo");
-        photo = photoInput.files[0];
-    }
-
-    // Validar campos obligatorios
-    if (!license_plate || !brand || !model || !registration_year || isNaN(price)) {
-        alert('Por favor, complete todos los campos obligatorios.');
-        return;
-    }
-
-    let body = {
-        "license_plate": license_plate,
-        "brand": brand,
-        "model": model,
-        "registration_year": registration_year,
-        "price": price,
-        "observations": observations,
-        "vehicle_type": vehicleType,
-        "fuel_type": fuelType,
-        "photo": photo
-    }
-
-    // Enviar la solicitud de actualización
-    sendUpdateRequest(body);
-}
-
-// Enviar la solicitud de actualización
-function sendUpdateRequest(bodyInput) {
-    const url = '/api/vehicle/update';
-
-    fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bodyInput),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Vehículo actualizado correctamente.');
-            window.location.href = '/img/home.html'; // Redirigir al inicio después de actualizar
-        } else {
-            alert('Error al actualizar el vehículo: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error al actualizar el vehículo:', error);
-        alert('Error al actualizar el vehículo. Consulte la consola para más detalles.');
-    });
-}
-
-

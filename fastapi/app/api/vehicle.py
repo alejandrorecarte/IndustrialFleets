@@ -107,9 +107,9 @@ class UpdateVehicleRequest(BaseModel):
     vehicle_type: VehicleType
     fuel_type: FuelType
 
-
 @router.post("/update", status_code=status.HTTP_200_OK)
-def post_update_vehicle(    license_plate: str = Form(...),
+def post_update_vehicle(    
+    license_plate: str = Form(...),
     brand: str = Form(...),
     model: str = Form(...),
     registration_year: int = Form(...),
@@ -149,7 +149,6 @@ def post_update_vehicle(    license_plate: str = Form(...),
                 observations=observations,
                 vehicle_type=vehicle_type,
                 fuel_type=fuel_type,
-                post_id=post_id,
                 photo=photo_base64
             )
             vehicle = update_vehicle(vehicle, user_email, db_connection)
