@@ -1,4 +1,5 @@
 let license_plate = null
+let photoPreviewData = null
 
 document.addEventListener('DOMContentLoaded', function () {
     const params = new URLSearchParams(window.location.search);
@@ -138,6 +139,7 @@ function loadVehicleData(license_plate) {
 
            // Mostrar la imagen actual si existe
            if (vehicle.photo) {
+                photoPreviewData = vehicle.photo;
                 const photoPreview = document.getElementById("photoPreview");
                 photoPreview.src = `data:image/png;base64,${vehicle.photo}`;
                 photoPreview.style.display = "block";
@@ -175,7 +177,9 @@ function deleteVehiclePhoto() {
     deleteButton.style.display = "none";
 }
 
-function saveVehicleChanges() {
+function saveVehicleChanges(event) {
+    event.preventDefault(); // Evitar que el formulario se envíe de forma tradicional
+
     const license_plate = document.getElementById("license_plate").value.trim();
     const brand = document.getElementById("brand").value.trim();
     const model = document.getElementById("model").value.trim();
@@ -184,7 +188,13 @@ function saveVehicleChanges() {
     const observations = document.getElementById("observations").value.trim();
     const vehicleType = document.getElementById("vehicleType").value.trim();
     const fuelType = document.getElementById("fuelType").value.trim();
-    const photoInput = document.getElementById("photo");
+
+    let photo = photoPreviewData;
+
+    if (document.getElementById("photo").files[0]) {
+        const photoInput = document.getElementById("photo");
+        photo = photoInput.files[0];
+    }
 
     // Validar campos obligatorios
     if (!license_plate || !brand || !model || !registration_year || isNaN(price)) {
@@ -192,41 +202,30 @@ function saveVehicleChanges() {
         return;
     }
 
-    const vehicleData = {
-        license_plate,
-        brand,
-        model,
-        registration_year: parseInt(registration_year),
-        price,
-        observations,
-        vehicle_type: vehicleType,
-        fuel_type: fuelType,
-    };
-
-    // Adjuntar imagen si se seleccionó una nueva
-    if (photoInput.files.length > 0) {
-        const file = photoInput.files[0];
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            vehicleData.photo = e.target.result.split(',')[1]; // Convertir a base64
-            sendUpdateRequest(vehicleData);
-        };
-        reader.readAsDataURL(file);
-    } else {
-        // Si no se seleccionó una nueva imagen, enviar la foto actual (si existe) o null
-        vehicleData.photo = (document.getElementById("photoPreview").src) ? document.getElementById("photoPreview").src.split(',')[1] : null;
-        sendUpdateRequest(vehicleData);
+    let body = {
+        "license_plate": license_plate,
+        "brand": brand,
+        "model": model,
+        "registration_year": registration_year,
+        "price": price,
+        "observations": observations,
+        "vehicle_type": vehicleType,
+        "fuel_type": fuelType,
+        "photo": photo
     }
+
+    // Enviar la solicitud de actualización
+    sendUpdateRequest(body);
 }
 
 // Enviar la solicitud de actualización
-function sendUpdateRequest(vehicleData) {
-    fetch('/api/vehicle/update', {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(vehicleData),
+function sendUpdateRequest(bodyInput) {
+    const url = '/api/vehicle/update';
+
+    fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyInput),
     })
     .then(response => response.json())
     .then(data => {
@@ -242,4 +241,5 @@ function sendUpdateRequest(vehicleData) {
         alert('Error al actualizar el vehículo. Consulte la consola para más detalles.');
     });
 }
+
 

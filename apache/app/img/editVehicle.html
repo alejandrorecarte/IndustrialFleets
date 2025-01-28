@@ -22,26 +22,26 @@
     <h1>Editar Vehículo</h1>
     <!-- Formulario para editar vehículos -->
     <div id="vehicleFormSection">
-        <form id="vehicleEditForm">
+        <form id="vehicleEditForm" method="POST" enctype="multipart/form-data">
+            <!-- Campos del formulario -->
             <label for="labelMatricula">Matricula:</label>
             <input type="text" id="license_plate" name="license_plate" placeholder="Matrícula" required readonly><br>
-
+        
             <label for="labelMarca">Marca:</label>
             <input type="text" id="brand" name="brand" placeholder="Marca" required><br>
-
+        
             <label for="labelModelo">Modelo:</label>
             <input type="text" id="model" name="model" placeholder="Modelo" required><br>
-
+        
             <label for="labelFecha">Fecha de matriculación:</label>
-            <input type="number" id="registration_year" name="registration_year" placeholder="Año de Registro" required
-                min="1900" max="2100"><br>
-
+            <input type="number" id="registration_year" name="registration_year" placeholder="Año de Registro" required min="1900" max="2100"><br>
+        
             <label for="labelPrecio">Precio:</label>
             <input type="number" id="price" name="price" placeholder="Precio" required step="0.01"><br>
-
+        
             <label for="labelObservaciones">Observaciones:</label>
             <textarea id="observations" name="observations" placeholder="Observaciones" maxlength="1000"></textarea><br>
-
+        
             <label for="vehicleType">Tipo de Vehículo:</label>
             <select id="vehicleType" name="vehicleType" required>
                 <option value="" disabled>Seleccionar Tipo de Vehículo</option>
@@ -54,7 +54,7 @@
                 <option value="CEMENT_TRUCK">Camión de cemento</option>
                 <option value="TBM">Tuneladora</option>
             </select><br>
-
+        
             <label for="fuelType">Tipo de Combustible:</label>
             <select id="fuelType" name="fuelType" required>
                 <option value="" disabled>Seleccionar Tipo de Combustible</option>
@@ -63,25 +63,15 @@
                 <option value="ELECTRIC">Eléctrico</option>
                 <option value="HYBRID">Híbrido</option>
             </select><br>
-
+        
             <div id="imageSection">
                 <label for="photo">Foto del vehículo:</label>
-                <!-- <img id="photoPreview" alt="Vista previa de la foto"
-                    style="width: 150px; display: none; margin-bottom: 10px;"><br>
-                <button id="deletePhotoBtn" style="display:none;">Eliminar / Remplazar imagen</button>
-                <input type="file" id="photo" name="photo" accept="image/*" onchange="handleImagePreview(event)">                
-                <p id="photoMessage">Si desea reemplazar la imagen existente, seleccione una nueva.</p>
-             -->
-
-            <input type="file" id="photo" name="photo" accept="image/*" style="display:none" onchange="handleImagePreview(event)">
-            <img id="photoPreview" alt="Vista previa de la foto" style="width: 150px; display: none; margin-bottom: 10px;">
-            <button type="button" id="editVehiclePhotoButton">Reemplazar imagen</button>
-
-            <form id="uploadVehiclesForm" style="display: none;">
-                <button type="submit" id="addVehicleBtn">Guardar cambios</button>
-            </form>
-
+                <input type="file" id="photo" name="photo" accept="image/*" style="display:none" onchange="handleImagePreview(event)">
+                <img id="photoPreview" alt="Vista previa de la foto" style="width: 150px; display: none; margin-bottom: 10px;">
+                <button type="button" id="editVehiclePhotoButton">Reemplazar imagen</button>
             </div><br>
+        
+            <button type="submit" id="addVehicleBtn">Guardar cambios</button>
         </form>
     </div>
 
