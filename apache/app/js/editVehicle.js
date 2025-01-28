@@ -8,36 +8,33 @@ document.addEventListener('DOMContentLoaded', function () {
     verificarAcceso(license_plate);
     loadVehicleData(license_plate);
 
-    document.getElementById('updateVehiclesForm').addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+    document.getElementById('updateVehiclesForm').addEventListener('click', function (event) {
+        event.preventDefault();
 
-        const formData = new FormData();
-        formData.append('license_plate', document.getElementById('license_plate').value);
-        formData.append('brand', document.getElementById('brand').value);
-        formData.append('model', document.getElementById('model').value);
-        formData.append('registration_year', document.getElementById('registration_year').value);
-        formData.append('price', document.getElementById('price').value);
-        formData.append('observations', document.getElementById('observations').value);
-        formData.append('vehicle_type', document.getElementById('vehicleType').value);
-        formData.append('fuel_type', document.getElementById('fuelType').value);
-
-        let photo = photoPreviewData;
-
-        if (document.getElementById('photo').files.length > 0) {
-            photo = document.getElementById('photo').files[0];
+        const body = {
+            'license_plate': document.getElementById('license_plate').value,
+            'brand': document.getElementById('brand').value,
+            "model": document.getElementById('model').value,
+            'registration_year': document.getElementById('registration_year').value,
+            'price': document.getElementById('price').value,
+            'observations': document.getElementById('observations').value,
+            'vehicle_type': document.getElementById('vehicleType').value,
+            'fuel_type': document.getElementById('fuelType').value
         }
-
-        formData.append('photo', photo); // Ahora enviamos el archivo, no el base64
 
         // Enviar los vehículos a la API
         fetch('/api/vehicle/update', {
             method: 'POST',
-            body: formData
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body),
         })
             .then(response => {
                 if (response.ok) {
-                    alert("Vehículo subido correctamente")
+                    alert("Vehículo subido correctamente, puedes cerrar la ventana")
                     console.log("Vehicle uploaded successfully");
+                    window.close();
                 } else {
                     alert("Hubo un problema al subir el vehículo.");
                     console.error("Error uploading vehicle.");
@@ -119,7 +116,7 @@ function loadVehicleData(license_plate) {
             document.getElementById("brand").value = vehicle.brand;
             document.getElementById("model").value = vehicle.model;
             document.getElementById("registration_year").value = parseInt(vehicle.registration_year);
-            document.getElementById("price").value = parseFloat(vehicle.iva).toFixed(2);
+            document.getElementById("price").value = parseFloat(vehicle.price).toFixed(2);
             document.getElementById("observations").value = vehicle.observations;
 
             // Seleccionar el tipo de vehículo en el desplegable
@@ -149,19 +146,4 @@ function loadVehicleData(license_plate) {
             }
         })
         .catch(error => console.error("Error al cargar los datos del vehículo:", error));
-}
-
-
-// Manejador para la vista previa de la imagen
-function handleImagePreview(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const photoPreview = document.getElementById("photoPreview");
-            photoPreview.src = e.target.result;
-            photoPreview.style.display = "block";
-        };
-        reader.readAsDataURL(file);
-    }
 }

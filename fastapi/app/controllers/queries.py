@@ -47,7 +47,7 @@ def create_vehicle_query():
     return "INSERT INTO Vehicles (license_plate, brand, model, registration_year, price, observations, vehicle_type, fuel_type, photo, post_id) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
 
 def update_vehicle_query():
-    return "UPDATE Vehicles SET brand = %s, model = %s, registration_year = %s, price = %s, observations = %s, vehicle_type = %s, fuel_type = %s, photo = %s WHERE license_plate LIKE %s"
+    return "UPDATE Vehicles SET brand = %s, model = %s, registration_year = %s, price = %s, observations = %s, vehicle_type = %s, fuel_type = %s WHERE license_plate LIKE %s"
 
 def delete_vehicle_query():
     return "DELETE FROM Vehicles WHERE license_plate LIKE %s"
