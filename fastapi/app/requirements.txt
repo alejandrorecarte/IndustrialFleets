@@ -9,3 +9,4 @@ pyjwt
 starlette
 python-multipart
 pydantic
+pytest

@@ -5,7 +5,6 @@ from database import get_db_connection
 import logging
 from controllers.vehicle import check_vehicle_access, create_vehicle, update_vehicle, delete_vehicle, get_vehicle, get_post_vehicles
 from utils import get_token_from_cookie
-from fastapi.responses import JSONResponse
 import os
 import base64
 
@@ -109,11 +108,24 @@ class UpdateVehicleRequest(BaseModel):
     fuel_type: FuelType
 
 @router.post("/update", status_code=status.HTTP_200_OK)
-def post_update_vehicle(body: UpdateVehicleRequest , request: Request, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
+def post_update_vehicle(body: UpdateVehicleRequest,
+    token: str = Depends(get_token_from_cookie),
+    db_connection=Depends(get_db_connection)):
     user_email = token["user_email"]
-    try:
-        vehicle = update_vehicle(body.vehicle, user_email, db_connection)
-        return {"vehicle": vehicle_getter(vehicle)}
+    try:    
+            # Crear el vehículo
+            vehicle = Vehicle(
+                license_plate=body.license_plate,
+                brand=body.brand,
+                model=body.model,
+                registration_year=body.registration_year,
+                price=body.price,
+                observations=body.observations,
+                vehicle_type=body.vehicle_type,
+                fuel_type=body.fuel_type
+            )
+            vehicle = update_vehicle(vehicle, user_email, db_connection)
+            return {"vehicle": vehicle_getter(vehicle)}
     except HTTPException as error:
         logger.warning(str(error.detail))
         raise HTTPException(
@@ -153,7 +165,7 @@ def post_delete_vehicle(body: DeleteVehicleRequest, request: Request, token: str
 def get_vehicle_by_license_plate(license_plate: str, request: Request, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
     try:
         vehicle = get_vehicle(license_plate, db_connection)
-        return JSONResponse(content={"vehicle": vehicle_getter(vehicle)})
+        return {"vehicle": vehicle_getter(vehicle)}
     
     except Exception as error:
         logger.warning(str(error))

@@ -19,22 +19,32 @@
         </nav>
     </header>
 
+    <h1>Editar Vehículo</h1>
     <!-- Formulario para editar vehículos -->
-    <div id="vehicleFormSection" style="display:none">
-        <h2>Editar Vehículo</h2>
-        <form id="vehicleEditForm">
-            <!-- vehicleForm -->
-            <input type="text" id="license_plate" placeholder="Matrícula" required><br>
-            <input type="text" id="brand" placeholder="Marca" required><br>
-            <input type="text" id="model" placeholder="Modelo" required><br>
-            <input type="number" id="registration_year" placeholder="Año de Registro" required min="1900"
-                max="2100"><br>
-            <input type="number" id="price" placeholder="Precio" required step="0.01"><br>
-            <textarea id="observations" placeholder="Observaciones" maxlength="1000"></textarea><br>
-
-            <!-- Desplegables de tipo de vehículo y combustible -->
-            <select id="vehicleType" required>
-                <option value="" disabled selected>Seleccionar Tipo de Vehículo</option>
+    <div id="vehicleFormSection">
+        <form id="vehicleEditForm" method="POST" enctype="multipart/form-data">
+            <!-- Campos del formulario -->
+            <label for="labelMatricula">Matricula:</label>
+            <input type="text" id="license_plate" name="license_plate" placeholder="Matrícula" required readonly><br>
+        
+            <label for="labelMarca">Marca:</label>
+            <input type="text" id="brand" name="brand" placeholder="Marca" required><br>
+        
+            <label for="labelModelo">Modelo:</label>
+            <input type="text" id="model" name="model" placeholder="Modelo" required><br>
+        
+            <label for="labelFecha">Fecha de matriculación:</label>
+            <input type="number" id="registration_year" name="registration_year" placeholder="Año de Registro" required min="1900" max="2100"><br>
+        
+            <label for="labelPrecio">Precio:</label>
+            <input type="number" id="price" name="price" placeholder="Precio" required step="0.01"><br>
+        
+            <label for="labelObservaciones">Observaciones:</label>
+            <textarea id="observations" name="observations" placeholder="Observaciones" maxlength="1000"></textarea><br>
+        
+            <label for="vehicleType">Tipo de Vehículo:</label>
+            <select id="vehicleType" name="vehicleType" required>
+                <option value="" disabled>Seleccionar Tipo de Vehículo</option>
                 <option value="CAR">Coche</option>
                 <option value="TRUCK">Camión</option>
                 <option value="MOTORCYCLE">Motocicleta</option>
@@ -44,22 +54,21 @@
                 <option value="CEMENT_TRUCK">Camión de cemento</option>
                 <option value="TBM">Tuneladora</option>
             </select><br>
-
-            <select id="fuelType" required>
-                <option value="" disabled selected>Seleccionar Tipo de Combustible</option>
+        
+            <label for="fuelType">Tipo de Combustible:</label>
+            <select id="fuelType" name="fuelType" required>
+                <option value="" disabled>Seleccionar Tipo de Combustible</option>
                 <option value="GASOLINE">Gasolina</option>
                 <option value="DIESEL">Diésel</option>
                 <option value="ELECTRIC">Eléctrico</option>
                 <option value="HYBRID">Híbrido</option>
             </select><br>
-
-            <!-- Permitir solo imágenes -->
-            <input type="file" id="photo" required accept="image/*"><br>
-            <!-- <button type="button" id="addVehicleBtn">Añadir Vehículo</button> -->
+        
         </form>
+        <button id="updateVehiclesForm">Guardar cambios</button>
+
     </div>
 
-    <button id="addVehicleButton">Guardar cambios</button>
 
 </body>
 

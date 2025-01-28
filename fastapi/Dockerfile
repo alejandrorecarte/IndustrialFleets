@@ -16,5 +16,9 @@ COPY fastapi/app/ /fastapi/app/
 # Expone el puerto en el que FastAPI estará corriendo
 EXPOSE 8000
 
+ENV PYTHONPATH=/fastapi/app:$PYTHONPATH
+
+RUN chmod -R 755 /fastapi/app && pytest
+
 # Comando para ejecutar FastAPI usando Uvicorn
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -27,7 +27,7 @@ def check_vehicle_access(user_email: str, license_plate: str, db_connection):
 
 def vehicle_formatter(vehicle_nf):
 
-    logger.debug(vehicle_nf)
+    #logger.debug(vehicle_nf)
     
     vehicle = Vehicle(
         license_plate=vehicle_nf[0],
@@ -57,7 +57,7 @@ def update_vehicle(vehicle: Vehicle, user_email: str, db_connection):
     check_vehicle_access(user_email, vehicle.license_plate, db_connection)
     
     query = update_vehicle_query()
-    params = (vehicle.brand, vehicle.model, vehicle.registration_year, vehicle.price, vehicle.observations, vehicle.vehicle_type, vehicle.fuel_type, vehicle.photo, vehicle.license_plate)
+    params = (vehicle.brand, vehicle.model, vehicle.registration_year, vehicle.price, vehicle.observations, vehicle.vehicle_type, vehicle.fuel_type, vehicle.license_plate)
     
     execute(query, params, db_connection)
     

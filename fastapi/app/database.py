@@ -83,7 +83,7 @@ def execute_query(query: str, params: tuple, connection):
 
             # Obtener los resultados
             results = cursor.fetchall()
-            logger.info(f"Query results: {results}")
+            # logger.info(f"Query results: {results}")
             return results
 
     except pymysql.MySQLError as error:

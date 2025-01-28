@@ -29,8 +29,8 @@ class Vehicle(BaseModel):
     observations: str
     vehicle_type: VehicleType
     fuel_type: FuelType
-    photo: Optional[bytes]
-    post_id: int
+    photo: Optional[bytes] = None
+    post_id: int = None
 
     class Config:
         # Esto asegura que los valores del Enum sean convertidos a cadenas en las respuestas JSON
