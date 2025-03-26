@@ -1,28 +1,28 @@
 version: '3.0'
 
 services:
-  db:
+  db8:
     build:
       context: .
       dockerfile: mariadb/Dockerfile
-    container_name: mariadba8
+    container_name: mariadb
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "3308:3306"
+      - "3306:3306"
     volumes:
       - docker_mariadb_data:/var/lib/mysql
       - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
-    container_name: phpmyadmina8
+    container_name: phpmyadmin
     environment:
       PMA_HOST: db
-      PMA_PORT: 3308
+      PMA_PORT: 3306
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     ports:
       - "7008:80"
@@ -38,7 +38,7 @@ services:
       - db
     environment:
       DB_HOST: db
-      DB_PORT: 3308
+      DB_PORT: 3306
       DB_USER: ${MYSQL_USER}
       DB_PASSWORD: ${MYSQL_PASSWORD}
       DB_NAME: ${MYSQL_DATABASE}
@@ -56,7 +56,7 @@ services:
     build:
       context: .
       dockerfile: apache/Dockerfile
-    container_name: apachea8
+    container_name: apache
     ports:
       - "6008:80"
     volumes:

@@ -26,17 +26,10 @@ def post_register(variables: RegisterRequest, response: Response, db_connection=
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid email"
             )
-        elif not validate_password_strength(variables.password):
-            logger.debug("Invalid password")
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Password is not strong enough"
-            )
-            
         user = User(email=variables.email, name=variables.name, last_name=variables.last_name, password=variables.password)
         register(user, db_connection)
         access_token = login(email=variables.email, password=variables.password, db_connection=db_connection)
-        response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite='Strict')
+        response.set_cookie(key="access_token", value=access_token, httponly=True, samesite='Strict')
         return {"message": "Register succesful", "token": access_token}
     except Exception as error:
         logger.warning(str(error))
@@ -44,7 +37,7 @@ def post_register(variables: RegisterRequest, response: Response, db_connection=
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(error)
         )
-    
+
 class LoginRequest(BaseModel):
     email: str
     password: str
@@ -54,7 +47,7 @@ def post_login(body: LoginRequest, response: Response, db_connection=Depends(get
     try:
         access_token = login(email=body.email, password=body.password, db_connection=db_connection)
         if access_token:
-            response.set_cookie(key="access_token", value=access_token, httponly=True, secure=True, samesite='Strict')
+            response.set_cookie(key="access_token", value=access_token, httponly=True, samesite='Strict')
             return {"message": "Login successful", "token": access_token}
         else:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
@@ -69,7 +62,7 @@ def post_login(body: LoginRequest, response: Response, db_connection=Depends(get
 @router.post("/logout", status_code=status.HTTP_202_ACCEPTED)
 def post_logout(response: Response, request: Request, token: str = Depends(get_token_from_cookie)):
     try:
-        response.set_cookie(key="access_token", max_age=-1, httponly=True, secure=True, samesite="Strict")
+        response.set_cookie(key="access_token", max_age=-1, httponly=True, samesite="Strict")
 
         return {"message": "Logout succesful"}
 

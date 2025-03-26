@@ -70,13 +70,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 password: password
             })
         })
-            .then(response => {
-                if (response.ok) {
+            .then(response => response.json())  // Convertimos la respuesta a JSON
+            .then(data => {
+                if (data.token) {  // Verificamos si existe el access_token en la respuesta
+                    // Guardar el access_token como cookie
+                    document.cookie = `access_token=${data.access_token}; path=/; secure; samesite=strict`;
+                    alert("Login exitoso")
+                    // Redirigir según el backUrl
                     if (backUrl === null) {
                         window.location.href = '/img/home.html';
-                    }
-                    else {
-                        window.location.href = backUrl
+                    } else {
+                        window.location.href = backUrl;
                     }
                 } else {
                     alert('Hubo un problema al iniciar sesión');
@@ -88,3 +92,4 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 });
+
