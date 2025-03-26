@@ -48,6 +48,7 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       PAGE_SIZE: ${PAGE_SIZE}
       MAX_IMAGE_SIZE: ${MAX_IMAGE_SIZE}
+      SALT: ${SALT}
     volumes:
       - ./fastapi/app:/fastapi/app
       - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql

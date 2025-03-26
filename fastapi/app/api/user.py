@@ -4,7 +4,7 @@ from models.user import User
 from database import get_db_connection
 import logging
 from controllers.user import register, login
-from utils import get_token_from_cookie, validate_email, validate_password_strength
+from utils import get_token_from_cookie, sanitize_input, validate_email, validate_password_strength
 
 logger = logging.getLogger(__name__)
 
@@ -17,18 +17,24 @@ class RegisterRequest(BaseModel):
     password: str
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-def post_register(variables: RegisterRequest, response: Response, db_connection=Depends(get_db_connection)):
+def post_register(body: RegisterRequest, response: Response, db_connection=Depends(get_db_connection)):
     """Registrar un nuevo usuario y devolver el token"""
+    
+    body.email = sanitize_input(body.email)
+    body.name = sanitize_input(body.name)
+    body.last_name = sanitize_input(body.last_name)
+    body.password = sanitize_input(body.password)
+    
     try:
-        if not validate_email(variables.email):
+        if not validate_email(body.email):
             logger.debug("Invalid email")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid email"
             )
-        user = User(email=variables.email, name=variables.name, last_name=variables.last_name, password=variables.password)
+        user = User(email=body.email, name=body.name, last_name=body.last_name, password=body.password)
         register(user, db_connection)
-        access_token = login(email=variables.email, password=variables.password, db_connection=db_connection)
+        access_token = login(email=body.email, password=body.password, db_connection=db_connection)
         response.set_cookie(key="access_token", value=access_token, httponly=True, samesite='Strict')
         return {"message": "Register succesful", "token": access_token}
     except Exception as error:
@@ -44,6 +50,10 @@ class LoginRequest(BaseModel):
 
 @router.post("/login", status_code=status.HTTP_202_ACCEPTED)
 def post_login(body: LoginRequest, response: Response, db_connection=Depends(get_db_connection)):
+    
+    body.email = sanitize_input(body.email)
+    body.password = sanitize_input(body.password)
+    
     try:
         access_token = login(email=body.email, password=body.password, db_connection=db_connection)
         if access_token:

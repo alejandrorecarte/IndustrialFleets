@@ -2,16 +2,21 @@ import bcrypt
 import jwt
 import re
 import os
+import html
+import bleach
 from fastapi import HTTPException, status, Request
 from datetime import datetime, timedelta, timezone
 
 def hash(value):
     if value:
-        hashed = bcrypt.hashpw(value.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-    return hashed
+        salt = os.getenv("SALT")
+        hashed = bcrypt.hashpw(value.encode("utf-8"), salt.encode("utf-8")).decode("utf-8")
+        return hashed
+    return None
 
-def verify_hash(value, stored_hash):
-    return bcrypt.checkpw(value.encode('utf-8'), stored_hash.encode('utf-8'))
+
+def verify_hash(value, hashed_value):
+    return bcrypt.checkpw(value.encode("utf-8"), hashed_value.encode("utf-8"))
 
 def get_token_from_cookie(request: Request):
     """
@@ -76,3 +81,8 @@ def validate_email(email):
         return True
     else:
         return False
+    
+def sanitize_input(user_input):
+ # Usamos bleach para eliminar etiquetas HTML no deseadas
+ escaped_input = html.escape(user_input)
+ return bleach.clean(escaped_input)
