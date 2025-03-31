@@ -4,7 +4,7 @@ from models.vehicle import Vehicle, VehicleType, FuelType
 from database import get_db_connection
 import logging
 from controllers.vehicle import check_vehicle_access, create_vehicle, update_vehicle, delete_vehicle, get_vehicle, get_post_vehicles
-from utils import get_token_from_cookie
+from utils import get_token_from_cookie, sanitize_input
 import os
 import base64
 
@@ -48,6 +48,13 @@ def post_create_vehicle(
     user_email = token["user_email"]
     
     try:
+        
+        license_plate = sanitize_input(license_plate)
+        brand =  sanitize_input(brand)
+        model = sanitize_input(model)
+        observations =  sanitize_input(observations)
+        photo = sanitize_input(photo)
+        
         # Verificar el tamaño del archivo
         photo_size = len(photo.file.read())  # Leer el archivo para obtener su tamaño
         if photo_size > MAX_IMAGE_SIZE:
@@ -113,19 +120,25 @@ def post_update_vehicle(body: UpdateVehicleRequest,
     db_connection=Depends(get_db_connection)):
     user_email = token["user_email"]
     try:    
-            # Crear el vehículo
-            vehicle = Vehicle(
-                license_plate=body.license_plate,
-                brand=body.brand,
-                model=body.model,
-                registration_year=body.registration_year,
-                price=body.price,
-                observations=body.observations,
-                vehicle_type=body.vehicle_type,
-                fuel_type=body.fuel_type
-            )
-            vehicle = update_vehicle(vehicle, user_email, db_connection)
-            return {"vehicle": vehicle_getter(vehicle)}
+        
+        license_plate =  sanitize_input(license_plate)
+        brand = sanitize_input(brand)
+        model =  sanitize_input(model)
+        observations =  sanitize_input(observations)
+        
+        # Crear el vehículo
+        vehicle = Vehicle(
+            license_plate=body.license_plate,
+            brand=body.brand,
+            model=body.model,
+            registration_year=body.registration_year,
+            price=body.price,
+            observations=body.observations,
+            vehicle_type=body.vehicle_type,
+            fuel_type=body.fuel_type
+        )
+        vehicle = update_vehicle(vehicle, user_email, db_connection)
+        return {"vehicle": vehicle_getter(vehicle)}
     except HTTPException as error:
         logger.warning(str(error.detail))
         raise HTTPException(
@@ -146,6 +159,8 @@ class DeleteVehicleRequest(BaseModel):
 def post_delete_vehicle(body: DeleteVehicleRequest, request: Request, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
     user_email = token["user_email"]
     try:
+        body.license_plate = sanitize_input(body.license_plate)
+        
         delete_vehicle(body.license_plate, user_email, db_connection)
         return {}
     except HTTPException as error:
@@ -164,6 +179,8 @@ def post_delete_vehicle(body: DeleteVehicleRequest, request: Request, token: str
 @router.get("/get", status_code=status.HTTP_200_OK)
 def get_vehicle_by_license_plate(license_plate: str, request: Request, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
     try:
+        license_plate = sanitize_input(license_plate)
+        
         vehicle = get_vehicle(license_plate, db_connection)
         return {"vehicle": vehicle_getter(vehicle)}
     
@@ -198,6 +215,8 @@ def get_vehicle_by_post_id(post_id: int, request: Request, token: str = Depends(
 def get_access(license_plate: str, request: Request, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
     user_email = token["user_email"]
     try:
+        license_plate = sanitize_input(license_plate)
+        
         check_vehicle_access(user_email, license_plate, db_connection)
         return {"access": "granted"}
     except Exception as error:

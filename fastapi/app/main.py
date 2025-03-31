@@ -7,7 +7,8 @@ from api.vehicle import router as vehicle_router
 from database import close_connection
 import logging
 from database import get_db_connection
-from utils import get_token_from_cookie
+from utils import get_token_from_cookie, prepare_response_extra_headers
+from flask_wtf.csrf import CSRFProtect
 
 # Leer las variables de entorno sin asignarles valores en el código
 CONNECTION_TRIES = os.getenv("CONNECTION_TRIES")  # Lee el número de intentos de conexión
@@ -24,6 +25,12 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")  # Contraseña de la base de datos
 DB_NAME = os.getenv("DB_NAME")  # Nombre de la base de datos
 
 app = FastAPI()
+csrf = CSRFProtect(app)
+
+@app.before_request
+def csrf_protect():
+    if not request.path.startswith("/login") and not request.path.startswith("/register"):
+        csrf.protect()
 
 # Incluir los routers para los diferentes endpoints
 app.include_router(user_router, prefix="/users", tags=["Users"])
@@ -39,9 +46,14 @@ app.add_middleware(
     allow_headers=["*"],  # Permitir todos los encabezados
 )
 
+if os.getenv("DEBUG", "False") == "True":
+    debug_level = logging.DEBUG
+else:
+    debug_level = logging.INFO
+
 # Configuración del logger para registrar mensajes
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=debug_level,
     format='%(levelname)s - %(name)s - %(asctime)s - %(message)s',
     handlers=[
         logging.StreamHandler(),
@@ -51,6 +63,9 @@ logging.basicConfig(
 
 # Crear un logger para esta aplicación
 logger = logging.getLogger(__name__)
+
+#Configuración de la cabecera
+extra_headers=prepare_response_extra_headers(True)
 
 # Evento de inicio de la aplicación
 @app.on_event("startup")
