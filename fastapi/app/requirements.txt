@@ -10,3 +10,6 @@ starlette
 python-multipart
 pydantic
 pytest
+bleach
+fastapi_csrf_protect
+werkzeug
