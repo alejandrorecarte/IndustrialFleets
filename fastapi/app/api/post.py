@@ -98,8 +98,8 @@ def get_post_by_id(post_id: int, request: Request, token: str = Depends(get_toke
 @router.get("/user", status_code=status.HTTP_200_OK)
 def get_user_post(page: int, user_email: str = None, token: str = Depends(get_token_from_cookie), db_connection=Depends(get_db_connection)):
     try:
-        
-        user_email = sanitize_input(user_email)
+        if user_email:
+            user_email = sanitize_input(user_email)
         
         if user_email is None:        
             user_email = token["user_email"]

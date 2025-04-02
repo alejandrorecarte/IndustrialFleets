@@ -11,14 +11,13 @@ from werkzeug.http import http_date
 
 def hash(value):
     if value:
-        salt = os.getenv("SALT")
-        hashed = bcrypt.hashpw(value.encode("utf-8"), salt.encode("utf-8")).decode("utf-8")
+        hashed = bcrypt.hashpw(value.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
         return hashed
     return None
 
-
 def verify_hash(value, hashed_value):
     return bcrypt.checkpw(value.encode("utf-8"), hashed_value.encode("utf-8"))
+
 
 def get_token_from_cookie(request: Request):
     """
@@ -41,8 +40,8 @@ def verify_token(token: str) -> dict:
     try:
         payload = jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=["HS256"])
         exp_timestamp = payload["exp"]
-        exp_datetime = datetime.utcfromtimestamp(exp_timestamp).replace(tzinfo=timezone.utc)
-        current_datetime = datetime.now(timezone.utc)
+        exp_datetime = datetime.datetime.utcfromtimestamp(exp_timestamp).replace(tzinfo=timezone.utc)
+        current_datetime = datetime.datetime.now(timezone.utc)
         if current_datetime > exp_datetime:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
         
@@ -57,7 +56,7 @@ def verify_token(token: str) -> dict:
     
 def create_token(email: str):
     
-        expiration_time = datetime.now(timezone.utc) + timedelta(minutes=int(os.getenv("EXPIRATION_MINUTES")))
+        expiration_time = datetime.datetime.now(timezone.utc) + timedelta(minutes=int(os.getenv("EXPIRATION_MINUTES")))
         payload = {
             "user_email": email,
             "exp": expiration_time

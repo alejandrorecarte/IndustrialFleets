@@ -52,9 +52,7 @@ def post_create_vehicle(
         license_plate = sanitize_input(license_plate)
         brand =  sanitize_input(brand)
         model = sanitize_input(model)
-        observations =  sanitize_input(observations)
-        photo = sanitize_input(photo)
-        
+        observations =  sanitize_input(observations)        
         # Verificar el tamaño del archivo
         photo_size = len(photo.file.read())  # Leer el archivo para obtener su tamaño
         if photo_size > MAX_IMAGE_SIZE:
@@ -69,9 +67,12 @@ def post_create_vehicle(
         # Leer el archivo en bytes
         photo_bytes = photo.file.read()
         photo_base64 = None
+        
         if photo_bytes:
             photo_base64 = base64.b64encode(photo_bytes).decode("utf-8")
         
+        photo_base64 = sanitize_input(photo_base64)
+
         # Crear el vehículo
         vehicle = Vehicle(
             license_plate=license_plate,

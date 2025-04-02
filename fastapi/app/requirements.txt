@@ -11,4 +11,5 @@ python-multipart
 pydantic
 pytest
 bleach
-flask_wtf
+fastapi_csrf_protect
+werkzeug
