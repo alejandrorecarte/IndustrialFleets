@@ -1,4 +1,4 @@
-version: '3.0'
+version: '3.8'
 
 services:
   db:
@@ -49,7 +49,6 @@ services:
       PAGE_SIZE: ${PAGE_SIZE}
       MAX_IMAGE_SIZE: ${MAX_IMAGE_SIZE}
       DEBUG: ${DEBUG}
-      SECRET_KEY: ${SECRET_KEY}
     volumes:
       - ./fastapi/app:/fastapi/app
       - ./mariadb/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -59,8 +58,10 @@ services:
     container_name: apachea8
     ports:
       - "6008:80"
+      - "6448:443"
     volumes:
       - ./apache/app:/usr/local/apache2/htdocs/
+      - ./apache/conf/modsecurity.conf:/etc/modsecurity/modsecurity.conf
     depends_on:
       - db
       - fastapi
