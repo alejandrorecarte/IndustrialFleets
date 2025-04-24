@@ -14,7 +14,7 @@ COPY ./app /usr/local/apache2/htdocs/
 RUN chmod -R 755 /usr/local/apache2/htdocs/
 
 COPY ./conf/proxy.conf /usr/local/apache2/conf/extra/proxy.conf
-COPY ./conf/modsecurity.conf /etc/modsecurity/modsecurity.conf
+COPY ./conf/modsecurity/modsecurity.conf /etc/modsecurity/modsecurity.conf
 COPY ./conf/evasive.conf /etc/apache2/mods-available/evasive.conf
 COPY ./conf/default-ssl.conf /usr/local/apache2/conf/extra/default-ssl.conf
 
