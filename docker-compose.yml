@@ -58,7 +58,6 @@ services:
       - "6008:80"
       - "6448:443"
     volumes:
-      - ./apache/app:/usr/local/apache2/htdocs/
       - ./apache/conf/modsecurity:/etc/modsecurity
     depends_on:
       - db
