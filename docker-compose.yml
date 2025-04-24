@@ -59,7 +59,7 @@ services:
       - "6448:443"
     volumes:
       - ./apache/app:/usr/local/apache2/htdocs/
-      - ./apache/conf:/etc/modsecurity
+      - ./apache/conf/modsecurity:/etc/modsecurity
     depends_on:
       - db
       - fastapi
