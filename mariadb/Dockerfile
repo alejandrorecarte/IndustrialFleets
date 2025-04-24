@@ -14,6 +14,7 @@ COPY /mariadb/init.sql /docker-entrypoint-initdb.d/
 # Estos scripts se ejecutarán cuando el contenedor se inicie por primera vez
 # COPY ./init.sql /docker-entrypoint-initdb.d/
 
+
 # Exponer el puerto 3306 para conectarse al contenedor
 EXPOSE 3306
 
