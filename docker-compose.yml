@@ -1,5 +1,9 @@
 version: '3.8'
 
+networks:
+  appnet:
+    driver: bridge
+
 services:
   db:
     build:
@@ -16,6 +20,9 @@ services:
     volumes:
       - docker_mariadb_data:/var/lib/mysql
       - ./mariadb:/docker-entrypoint-initdb.d
+    networks:
+      - appnet
+
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     container_name: phpmyadmina8
@@ -27,6 +34,8 @@ services:
       - "7008:80"
     depends_on:
       - db
+    networks:
+      - appnet
 
   fastapi:
     build:
@@ -50,7 +59,9 @@ services:
       DEBUG: ${DEBUG}
     volumes:
       - ./fastapi/app:/fastapi/app
-      
+    networks:
+      - appnet
+
   apache:
     build: ./apache
     container_name: apachea8
@@ -62,6 +73,8 @@ services:
     depends_on:
       - db
       - fastapi
+    networks:
+      - appnet
 
 volumes:
   docker_mariadb_data:

@@ -1,28 +1,37 @@
 FROM python:3.10-slim
 
-# Crea y usa un entorno virtual
-RUN python -m venv /opt/venv
+# 1. Crear un usuario no root
+RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-# Añade el binario del venv al PATH
+# 2. Crear el entorno virtual y asignarlo a appuser
+RUN python -m venv /opt/venv \
+ && chown -R appuser:appuser /opt/venv
+
+# 3. Poner el venv en el PATH
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Establece el directorio de trabajo
+# 4. Establecer directorio de trabajo y permisos
 WORKDIR /app
+RUN mkdir -p /app \
+ && chown appuser:appuser /app
 
-# Copia requirements.txt (ajustado según dónde se ejecute el build)
-COPY fastapi/app/requirements.txt .
+# 5. Cambiar a appuser antes de copiar e instalar
+USER appuser
 
-# Instala las dependencias
+# 6. Copiar requirements e instalar dependencias
+COPY --chown=appuser:appuser fastapi/app/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia todo el código fuente
-COPY fastapi/app/ .
+# 7. Copiar el código fuente
+COPY --chown=appuser:appuser fastapi/app/ .
 
-# Expone el puerto
+# 8. Exponer el puerto y configurar PYTHONPATH
 EXPOSE 8000
-
-# Asegura que Python pueda encontrar los módulos
 ENV PYTHONPATH=/app:$PYTHONPATH
 
-# Ejecuta la app
+# 9. Añadir HEALTHCHECK para Checkov
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+  CMD curl --fail http://localhost:8000/health || exit 1
+
+# 10. Ejecutar la aplicación
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
