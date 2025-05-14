@@ -1,0 +1,38 @@
+# Dockerfile.ci
+FROM python:3.11-slim
+
+# 1. Instalar dependencias de sistema
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl unzip wget git openjdk-17-jre-headless docker.io jq && \
+    rm -rf /var/lib/apt/lists/*
+
+# 2. Instalar SonarScanner
+RUN wget -qO sonar.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip && \
+    unzip sonar.zip && \
+    mv sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner && \
+    ln -s /opt/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner && \
+    rm sonar.zip
+
+# 3. Crear venv y herramientas Python
+RUN python -m venv /opt/venv && \
+    /opt/venv/bin/pip install --upgrade pip && \
+    /opt/venv/bin/pip install detect-secrets trufflehog checkov
+ENV PATH="/opt/venv/bin:$PATH"
+
+# 4. Instalar Syft y Grype
+RUN curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin && \
+    curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+
+# 5. Instalar OWASP ZAP
+RUN wget -qO zap.zip https://github.com/zaproxy/zaproxy/releases/download/v2.16.1/ZAP_2.16.1_Linux.zip && \
+    unzip zap.zip -d /opt/zap && \
+    ln -s /opt/zap/zap.sh /usr/local/bin/zap && \
+    ln -s /opt/zap/zap-baseline.py /usr/local/bin/zap-baseline.py && \
+    rm zap.zip
+
+# 6. Crear usuario jenkins
+RUN groupadd -r jenkins && useradd -r -g jenkins jenkins && \
+    mkdir /home/jenkins && chown -R jenkins:jenkins /home/jenkins
+USER jenkins
+WORKDIR /home/jenkins
+ENTRYPOINT ["tail", "-f", "/dev/null"]
