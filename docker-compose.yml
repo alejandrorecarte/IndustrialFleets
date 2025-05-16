@@ -9,6 +9,7 @@ services:
     build:
       context: .
       dockerfile: mariadb/Dockerfile
+    image: recarte/industrialfleets_mariadb:latest
     container_name: mariadba8
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -41,6 +42,7 @@ services:
     build:
       context: .
       dockerfile: fastapi/Dockerfile
+    image: recarte/industrialfleets_fastapi:latest
     container_name: fastapi
     depends_on:
       - db
@@ -64,6 +66,7 @@ services:
 
   apache:
     build: ./apache
+    image: recarte/industrialfleets_apache:latest
     container_name: apachea8
     ports:
       - "6008:80"
