@@ -5,7 +5,9 @@ RUN apt-get update && apt-get install -y \
       libapache2-mod-evasive \
       git \
       openssl \
+      apache2-utils \
     && rm -rf /var/lib/apt/lists/*
+
 
 RUN groupadd -r appuser && useradd -r -g appuser appuser \
     && mkdir -p /usr/local/apache2/htdocs \
@@ -13,6 +15,8 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser \
 
 # Añadido para que logs sea accesible por appuser
 RUN mkdir -p /usr/local/apache2/logs && chown -R appuser:appuser /usr/local/apache2/logs
+COPY ./conf/proxy.conf /usr/local/apache2/conf/proxy.conf
+RUN chmod 644 /usr/local/apache2/conf/proxy.conf && echo 'Include conf/proxy.conf' >> /usr/local/apache2/conf/httpd.conf
 
 USER appuser
 
