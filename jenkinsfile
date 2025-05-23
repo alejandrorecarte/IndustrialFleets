@@ -1,0 +1,185 @@
+pipeline {
+    agent {
+        docker {
+            image 'recarte/ci-agent:latest'
+            args  '--user root'
+        }
+    }
+
+    stages {
+        stage('Clone') {
+            steps {
+                git url: 'https://github.com/alejandrorecarte/IndustrialFleets'
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                sh 'pip install -r fastapi/app/requirements.txt'
+                sh 'python -m compileall fastapi/app'
+                sh 'pytest -vv --junit-xml=test-reports/results.xml fastapi/app/pytest'
+            }
+            post {
+                always {
+                    junit 'test-reports/results.xml'
+                }
+            }
+        }
+
+        stage('Scanners') {
+            parallel {
+                stage('TruffleHog') {
+                    steps {
+                        sh '''
+                            detect-secrets scan --all-files . > trufflehog-results.json
+                            cat trufflehog-results.json | jq . > trufflehog-report.html
+                        '''
+                        archiveArtifacts artifacts: 'trufflehog-results.json', allowEmptyArchive: true
+                        publishHTML(target: [
+                            reportName: 'TruffleHog Report',
+                            reportDir: '.',
+                            reportFiles: 'trufflehog-report.html',
+                            keepAll: true,
+                            alwaysLinkToLastBuild: true,
+                            allowMissing: false
+                        ])
+                    }
+                }
+
+                stage('Detect Secrets') {
+                    steps {
+                        sh '''
+                            detect-secrets scan > detectSecretsResults.json
+                            cat detectSecretsResults.json | jq . > detectSecrets-report.html
+                        '''
+                        archiveArtifacts artifacts: 'detectSecretsResults.json', allowEmptyArchive: true
+                        publishHTML(target: [
+                            reportName: 'Detect Secrets Report',
+                            reportDir: '.',
+                            reportFiles: 'detectSecrets-report.html',
+                            keepAll: true,
+                            alwaysLinkToLastBuild: true,
+                            allowMissing: false
+                        ])
+                    }
+                }
+
+                stage('Dependency-Check') {
+                    steps {
+                        dependencyCheck additionalArguments: """
+                            -o './'
+                            -s './'
+                            -f 'ALL'
+                            --prettyPrint
+                        """, odcInstallation: 'OWASP Dependency-Check Vulnerabilities'
+                        dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+                    }
+                }
+
+                stage('SonarCloud') {
+                    steps {
+                        withSonarQubeEnv('SonarCloud') {
+                            sh """
+                                sonar-scanner \
+                                  -Dsonar.projectKey=alejandrorecarte_IndustrialFleets \
+                                  -Dsonar.organization=bewaspsonarpass2025 \
+                                  -Dsonar.host.url=https://sonarcloud.io \
+                                  -Dsonar.login=$SONAR_TOKEN
+                            """
+                        }
+                    }
+                }
+
+                stage('Checkov') {
+                    steps {
+                        sh '''
+                            checkov --directory . --framework dockerfile --skip-path venv --soft-fail --output junitxml > checkov-report.xml
+                        '''
+                    }
+                    post {
+                        always {
+                            junit 'checkov-report.xml'
+                        }
+                    }
+                }
+
+                stage('Grype') {
+                    steps {
+                        sh '''
+                            syft dir:. -o cyclonedx-json > sbom.json
+                            grype sbom:sbom.json -o json > grype-report.json
+                            cat grype-report.json | jq . > grype-report.html
+                        '''
+                        archiveArtifacts artifacts: 'grype-report.json', allowEmptyArchive: true
+                        publishHTML(target: [
+                            reportName: 'Grype Vulnerabilities',
+                            reportDir: '.',
+                            reportFiles: 'grype-report.html',
+                            keepAll: true,
+                            alwaysLinkToLastBuild: true,
+                            allowMissing: false
+                        ])
+                    }
+                }
+            }
+        }
+
+        stage('Docker version & Start App') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+        
+                        docker-compose down --remove-orphans || true
+                        docker-compose build
+        
+                        docker push recarte/industrialfleets_apache:latest
+                        docker push recarte/industrialfleets_fastapi:latest
+                        docker push recarte/industrialfleets_mariadb:latest
+        
+                        docker-compose up -d
+                    '''
+                }
+            }
+        }
+
+        stage('Frontend Test') {
+            parallel {
+                stage('OWASP ZAP') {
+                    steps {
+                        sh '''
+                            mkdir -p zap-reports && chmod 775 zap-reports
+                            docker run --rm \
+                              --network industrialfleets_appnet \
+                              -u $(id -u):$(id -g) \
+                              -v $(pwd)/zap-reports:/zap/wrk:rw \
+                              -t zaproxy/zap-stable zap-baseline.py \
+                                -t http://apache:80 \
+                                -g zap-gen.conf \
+                                -I \
+                                -r /zap/wrk/zap-report.html
+                        '''
+                    }
+                }
+        
+                stage('Puppeteer') {
+                    steps {
+                        sh '''
+                            cd puppeteer
+                            node login_failure_csrf.js
+                        '''
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline finalizado'
+        }
+        failure {
+            echo 'Algo falló en la pipeline 🚨'
+        }
+    }
+}
