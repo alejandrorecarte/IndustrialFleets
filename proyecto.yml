@@ -1,0 +1,337 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: industrialfleets
+
+---
+# Secret para las credenciales MySQL y otras variables sensibles
+apiVersion: v1
+kind: Secret
+metadata:
+  name: industrialfleets-secrets
+  namespace: industrialfleets
+type: Opaque
+data:
+  MYSQL_ROOT_PASSWORD: Y2hhbmdlbWU=        # 'changeme' en base64
+  MYSQL_USER: YWRtaW4=                      # 'admin' en base64
+  MYSQL_PASSWORD: Y2hhbmdlbWU=              # 'changeme' en base64
+  SECRET_KEY: Y2hhbmdlbWU=                   # 'changeme' en base64
+
+---
+# ConfigMap para configuración no sensible si se necesita (opcional)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: industrialfleets-config
+  namespace: industrialfleets
+data:
+  DEBUG: "True"
+  MYSQL_DATABASE: industrialfleets
+  CONNECTION_TRIES: "5"
+  EXPIRATION_MINUTES: "60"
+  PAGE_SIZE: "15"
+  MAX_IMAGE_SIZE: "5"
+
+---
+# Volumen persistente para MariaDB (datos)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mariadb-pvc
+  namespace: industrialfleets
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+# Volumen persistente para logs de Python FastAPI (/var/log/api)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: fastapi-logs-pvc
+  namespace: industrialfleets
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# Volumen persistente para logs Apache (/var/log/apache2)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: apache-logs-pvc
+  namespace: industrialfleets
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# Deployment MariaDB
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb
+  namespace: industrialfleets
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      containers:
+        - name: mariadb
+          image: mariadb:10.11.5
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: industrialfleets-secrets
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: industrialfleets-config
+                  key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: industrialfleets-secrets
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: industrialfleets-secrets
+                  key: MYSQL_PASSWORD
+          volumeMounts:
+            - name: mariadb-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mariadb-storage
+          persistentVolumeClaim:
+            claimName: mariadb-pvc
+
+---
+# Service para MariaDB (acceso interno)
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb
+  namespace: industrialfleets
+spec:
+  selector:
+    app: mariadb
+  ports:
+    - port: 3306
+      targetPort: 3306
+  clusterIP: None
+
+---
+# Deployment FastAPI (Python)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi
+  namespace: industrialfleets
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi
+  template:
+    metadata:
+      labels:
+        app: fastapi
+    spec:
+      containers:
+        - name: fastapi
+          image: tuusuario/pepsapi:1.0
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DB_HOST
+              value: mariadb
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: industrialfleets-secrets
+                  key: MYSQL_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: industrialfleets-secrets
+                  key: MYSQL_PASSWORD
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: industrialfleets-config
+                  key: MYSQL_DATABASE
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: industrialfleets-secrets
+                  key: SECRET_KEY
+            - name: DEBUG
+              valueFrom:
+                configMapKeyRef:
+                  name: industrialfleets-config
+                  key: DEBUG
+            - name: CONNECTION_TRIES
+              valueFrom:
+                configMapKeyRef:
+                  name: industrialfleets-config
+                  key: CONNECTION_TRIES
+            - name: EXPIRATION_MINUTES
+              valueFrom:
+                configMapKeyRef:
+                  name: industrialfleets-config
+                  key: EXPIRATION_MINUTES
+            - name: PAGE_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: industrialfleets-config
+                  key: PAGE_SIZE
+            - name: MAX_IMAGE_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: industrialfleets-config
+                  key: MAX_IMAGE_SIZE
+          volumeMounts:
+            - name: fastapi-logs
+              mountPath: /var/log/api
+      volumes:
+        - name: fastapi-logs
+          persistentVolumeClaim:
+            claimName: fastapi-logs-pvc
+
+---
+# Service FastAPI (ClusterIP solo para internal)
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi
+  namespace: industrialfleets
+spec:
+  selector:
+    app: fastapi
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP
+
+---
+# Deployment Apache WAF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apache-waf
+  namespace: industrialfleets
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: apache-waf
+  template:
+    metadata:
+      labels:
+        app: apache-waf
+    spec:
+      containers:
+        - name: apache-waf
+          image: tuusuario/pepswaf:1.0
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+          volumeMounts:
+            - name: apache-logs
+              mountPath: /var/log/apache2
+      volumes:
+        - name: apache-logs
+          persistentVolumeClaim:
+            claimName: apache-logs-pvc
+
+---
+# Service Apache WAF (NodePort para acceso externo)
+apiVersion: v1
+kind: Service
+metadata:
+  name: apache-waf
+  namespace: industrialfleets
+spec:
+  selector:
+    app: apache-waf
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      nodePort: 30442
+    - name: https
+      port: 443
+      targetPort: 443
+      nodePort: 30443
+  type: NodePort
+
+---
+# Deployment phpMyAdmin
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: phpmyadmin
+  namespace: industrialfleets
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: phpmyadmin
+  template:
+    metadata:
+      labels:
+        app: phpmyadmin
+    spec:
+      containers:
+        - name: phpmyadmin
+          image: phpmyadmin/phpmyadmin:latest
+          env:
+            - name: PMA_HOST
+              value: mariadb
+            - name: PMA_PORT
+              value: "3306"
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: industrialfleets-secrets
+                  key: MYSQL_ROOT_PASSWORD
+          ports:
+            - containerPort: 80
+
+---
+# Service phpMyAdmin (NodePort)
+apiVersion: v1
+kind: Service
+metadata:
+  name: phpmyadmin
+  namespace: industrialfleets
+spec:
+  selector:
+    app: phpmyadmin
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
+  type: NodePort
